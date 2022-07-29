@@ -1,18 +1,9 @@
 declare const unsafeWindow: Window;
 
-declare enum VMScriptRunAt {
-  DocumentStart = 'document-start',
-  DocumentBody = 'document-body',
-  DocumentEnd = 'document-end',
-  DocumentIdle = 'document-idle',
-}
+declare type VMScriptRunAt = 'document-start' | 'document-body' | 'document-end' | 'document-idle';
 
 /** Injection mode of a script. */
-declare enum VMScriptInjectInto {
-  auto = 'auto',
-  page = 'page',
-  content = 'content',
-}
+declare type VMScriptInjectInto = 'auto' | 'page' | 'content';
 
 /**
  * An object that exposes information about the current userscript.
@@ -250,20 +241,14 @@ declare interface VMScriptXHRControl {
   abort: () => void;
 }
 
-declare enum VMScriptResponseType {
-  text = 'text',
-  json = 'json',
-  blob = 'blob',
-  arraybuffer = 'arraybuffer',
-  document = 'document',
-}
+declare type VMScriptResponseType = 'text' | 'json' | 'blob' | 'arraybuffer' | 'document';
 
-declare interface VMScriptResponseObject {
+declare interface VMScriptResponseObject<T> {
   status: number;
   statusText: string;
   readyState: number;
   responseHeaders: string;
-  response: string | Blob | ArrayBuffer | Document | object | null;
+  response: T;
   responseText: string | null;
   /** The final URL after redirection. */
   finalUrl: string;
@@ -272,7 +257,7 @@ declare interface VMScriptResponseObject {
 }
 
 /** Makes a request like XMLHttpRequest, with some special capabilities, not restricted by same-origin policy. */
-declare function GM_xmlhttpRequest(details: {
+declare function GM_xmlhttpRequest<T>(details: {
   /** URL relative to current page is also allowed. */
   url: string;
   /** HTTP method, default as `GET`. */
@@ -313,14 +298,14 @@ declare function GM_xmlhttpRequest(details: {
   context?: unknown;
   /** When set to `true`, no cookie will be sent with the request and the response cookies will be ignored. The default value is `false`. */
   anonymous?: boolean;
-  onabort?: (resp: VMScriptResponseObject) => void;
-  onerror?: (resp: VMScriptResponseObject) => void;
-  onload?: (resp: VMScriptResponseObject) => void;
-  onloadend?: (resp: VMScriptResponseObject) => void;
-  onloadstart?: (resp: VMScriptResponseObject) => void;
-  onprogress?: (resp: VMScriptResponseObject) => void;
-  onreadystatechange?: (resp: VMScriptResponseObject) => void;
-  ontimeout?: (resp: VMScriptResponseObject) => void;
+  onabort?: (resp: VMScriptResponseObject<T>) => void;
+  onerror?: (resp: VMScriptResponseObject<T>) => void;
+  onload?: (resp: VMScriptResponseObject<T>) => void;
+  onloadend?: (resp: VMScriptResponseObject<T>) => void;
+  onloadstart?: (resp: VMScriptResponseObject<T>) => void;
+  onprogress?: (resp: VMScriptResponseObject<T>) => void;
+  onreadystatechange?: (resp: VMScriptResponseObject<T>) => void;
+  ontimeout?: (resp: VMScriptResponseObject<T>) => void;
 }): VMScriptXHRControl;
 
 /** Downloads a URL to a local file. */
@@ -333,9 +318,9 @@ declare function GM_download(options: {
   onload?: () => void;
   headers?: Record<string, string>;
   timeout?: number;
-  onerror?: (resp: VMScriptResponseObject) => void;
-  onprogress?: (resp: VMScriptResponseObject) => void;
-  ontimeout?: (resp: VMScriptResponseObject) => void;
+  onerror?: (resp: VMScriptResponseObject<Blob>) => void;
+  onprogress?: (resp: VMScriptResponseObject<Blob>) => void;
+  ontimeout?: (resp: VMScriptResponseObject<Blob>) => void;
 }): void;
 declare function GM_download(
   /** The URL to download. */
@@ -354,7 +339,7 @@ declare interface VMScriptGMObject {
   addStyle: typeof GM_addStyle;
   addElement: typeof GM_addElement;
   registerMenuCommand: typeof GM_registerMenuCommand;
-  getResourceUrl: typeof GM_getResourceURL;
+  getResourceUrl: (name: string, isBlobUrl?: boolean) => Promise<string>;
   notification: typeof GM_notification;
   openInTab: typeof GM_openInTab;
   setClipboard: typeof GM_setClipboard;
