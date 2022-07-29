@@ -1,0 +1,21 @@
+{
+  "name": "@violentmonkey/types",
+  "version": "0.0.0",
+  "description": "Type declaration for GM functions in Violentmonkey",
+  "author": "Gerald <gera2ld@live.com>",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "files": [
+    "index.d.ts"
+  ],
+  "keywords": [
+    "violentmonkey",
+    "userscript"
+  ],
+  "license": "ISC",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "repository": "git@github.com:violentmonkey/types.git"
+}
