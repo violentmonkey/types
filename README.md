@@ -13,3 +13,14 @@ The APIs should be almost the same as those in Tampermonkey, so `@types/tampermo
 ```bash
 $ npm i @violentmonkey/types
 ```
+
+Add `@violentmonkey/types` to your `tsconfig.json`:
+
+```json
+{
+  "include": [
+    "other paths...",
+    "node_modules/@violentmonkey/types"
+  ]
+}
+```
