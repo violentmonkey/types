@@ -26,13 +26,11 @@ declare const GM_info: {
    * extension API (`browser.runtime.getPlatformInfo` and `getBrowserInfo`).
    */
   platform: {
-    /** One of `arm`, `mips`, `mips64`, `x86-32`, `x86-64`. */
-    arch: string;
+    arch: 'arm' | 'arm64' | 'x86-32' | 'x86-64' | 'mips' | 'mips64';
     /** `chrome`, `firefox` or whatever was returned by the API. */
     browserName: string;
     browserVersion: string;
-    /** One of `android`, `cros`, `linux`, `mac`, `openbsd`, `win`. */
-    os: string;
+    os: 'mac' | 'win' | 'android' | 'cros' | 'linux' | 'openbsd' | 'fuchsia';
   };
   /** Contains structured fields from the *Metadata Block*. */
   script: {
