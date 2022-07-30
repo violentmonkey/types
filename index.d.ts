@@ -5,10 +5,27 @@ declare type VMScriptRunAt = 'document-start' | 'document-body' | 'document-end'
 /** Injection mode of a script. */
 declare type VMScriptInjectInto = 'auto' | 'page' | 'content';
 
-/**
- * An object that exposes information about the current userscript.
- */
-declare const GM_info: {
+declare interface VMScriptGMInfoPlatform {
+  arch: 'arm' | 'arm64' | 'x86-32' | 'x86-64' | 'mips' | 'mips64';
+  /** `chrome`, `firefox` or whatever was returned by the API. */
+  browserName: string;
+  browserVersion: string;
+  os: 'mac' | 'win' | 'android' | 'cros' | 'linux' | 'openbsd' | 'fuchsia';
+}
+
+declare interface VMScriptGMInfoScriptMeta {
+  description: string;
+  excludes: string[];
+  includes: string[];
+  matches: string[];
+  name: string;
+  namespace: string;
+  resources: Array<{ name: string; url: string }>;
+  runAt: VMScriptRunAt;
+  version: string;
+}
+
+declare interface VMScriptGMInfoObject {
   /** Unique ID of the script. */
   uuid: string;
   /** The meta block of the script. */
@@ -25,28 +42,17 @@ declare const GM_info: {
    * data is obtained in the background page of Violentmonkey using a specialized
    * extension API (`browser.runtime.getPlatformInfo` and `getBrowserInfo`).
    */
-  platform: {
-    arch: 'arm' | 'arm64' | 'x86-32' | 'x86-64' | 'mips' | 'mips64';
-    /** `chrome`, `firefox` or whatever was returned by the API. */
-    browserName: string;
-    browserVersion: string;
-    os: 'mac' | 'win' | 'android' | 'cros' | 'linux' | 'openbsd' | 'fuchsia';
-  };
+  platform: VMScriptGMInfoPlatform;
   /** Contains structured fields from the *Metadata Block*. */
-  script: {
-    description: string;
-    excludes: string[];
-    includes: string[];
-    matches: string[];
-    name: string;
-    namespace: string;
-    resources: Array<{ name: string; url: string }>;
-    runAt: VMScriptRunAt;
-    version: string;
-  };
+  script: VMScriptGMInfoScriptMeta;
   /** The injection mode of current script. */
   injectInto: VMScriptInjectInto;
-};
+}
+
+/**
+ * An object that exposes information about the current userscript.
+ */
+declare const GM_info: VMScriptGMInfoObject;
 
 /** Retrieves a value for current script from storage. */
 declare function GM_getValue<T>(name: string, defaultValue?: T): T;
@@ -57,19 +63,21 @@ declare function GM_deleteValue(name: string): void;
 /** Returns an array of keys of all available values within this script. */
 declare function GM_listValues(): string[];
 
+declare type VMScriptGMValueChangeCallback<T> = (
+  /** The name of the observed variable */
+  name: string,
+  /** The old value of the observed variable (`undefined` if it was created) */
+  oldValue: T,
+  /** The new value of the observed variable (`undefined` if it was deleted) */
+  newValue: T,
+  /** `true` if modified by the userscript instance of another tab or `false` for this script instance. Can be used by scripts of different browser tabs to communicate with each other. */
+  remote: boolean
+) => void;
+
 /** Adds a change listener to the storage and returns the listener ID. */
 declare function GM_addValueChangeListener<T>(
   name: string,
-  callback: (
-    /** The name of the observed variable */
-    name: string,
-    /** The old value of the observed variable (`undefined` if it was created) */
-    oldValue: T,
-    /** The new value of the observed variable (`undefined` if it was deleted) */
-    newValue: T,
-    /** `true` if modified by the userscript instance of another tab or `false` for this script instance. Can be used by scripts of different browser tabs to communicate with each other. */
-    remote: boolean
-  ) => void
+  callback: VMScriptGMValueChangeCallback<T>
 ): string;
 /** Removes a change listener by its ID. */
 declare function GM_removeValueChangeListener(listenerId: string): void;
@@ -137,7 +145,7 @@ declare function GM_addElement(
 /** Appends and returns a `<style>` element with the specified CSS. */
 declare function GM_addStyle(css: string): HTMLStyleElement;
 
-declare interface VMScriptTabControl {
+declare interface VMScriptGMTabControl {
   /** Сan be assigned to a function. If provided, it will be called when the opened tab is closed. */
   onclose?: () => void;
   /** Whether the opened tab is closed. */
@@ -146,33 +154,35 @@ declare interface VMScriptTabControl {
   close: () => void;
 }
 
+declare interface VMScriptGMTabOptions {
+  /** Make the new tab active (i.e. open in foreground). Default as `true`. */
+  active?: boolean;
+  /**
+* Firefox only.
+*
+* - not specified = reuse script's tab container
+* - `0` = default (main) container
+* - `1`, `2`, etc. = internal container index
+*/
+  container?: number;
+  /** Insert the new tab next to the current tab and set its `openerTab` so when it's closed the original tab will be focused automatically. When `false` or not specified, the usual browser behavior is to open the tab at the end of the tab list. Default as `true`. */
+  insert?: boolean;
+  /** Pin the tab (i.e. show without a title at the beginning of the tab list). Default as `false`. */
+  pinned?: boolean;
+}
+
 /** Opens URL in a new tab. */
 declare function GM_openInTab(
   /** The URL to open in a new tab. URL relative to current page is also allowed. Note: Firefox does not support data URLs. */
   url: string,
-  options?: {
-    /** Make the new tab active (i.e. open in foreground). Default as `true`. */
-    active?: boolean;
-    /**
-     * Firefox only.
-     *
-     * - not specified = reuse script's tab container
-     * - `0` = default (main) container
-     * - `1`, `2`, etc. = internal container index
-     */
-    container?: number;
-    /** Insert the new tab next to the current tab and set its `openerTab` so when it's closed the original tab will be focused automatically. When `false` or not specified, the usual browser behavior is to open the tab at the end of the tab list. Default as `true`. */
-    insert?: boolean;
-    /** Pin the tab (i.e. show without a title at the beginning of the tab list). Default as `false`. */
-    pinned?: boolean;
-  }
-): VMScriptTabControl;
+  options?: VMScriptGMTabOptions
+): VMScriptGMTabControl;
 declare function GM_openInTab(
   /** The URL to open in a new tab. URL relative to current page is also allowed. Note: Firefox does not support data URLs. */
   url: string,
   /** Open the tab in background. Note, this is a reverse of the first usage method so for example `true` is the same as `{ active: false }`. */
   openInBackground?: boolean
-): VMScriptTabControl;
+): VMScriptGMTabControl;
 
 /**
  * Registers a command in Violentmonkey popup menu.
@@ -194,13 +204,12 @@ declare function GM_unregisterMenuCommand(
  * A control object returned by `GM_notification`.
  * `control.remove()` can be used to remove the notification.
  */
-declare interface VMScriptNotificationControl {
+declare interface VMScriptGMNotificationControl {
   /** Remove the notification immediately. */
   remove: () => Promise<void>;
 }
 
-/** Shows an HTML5 desktop notification. */
-declare function GM_notification(options: {
+declare interface VMScriptGMNotificationOptions {
   /** Main text of the notification. */
   text: string;
   /** Title of the notification. */
@@ -211,7 +220,10 @@ declare function GM_notification(options: {
   onclick?: () => void;
   /** Callback when the notification is closed, either by user or by system. */
   ondone?: () => void;
-}): VMScriptNotificationControl;
+}
+
+/** Shows an HTML5 desktop notification. */
+declare function GM_notification(options: VMScriptGMNotificationOptions): VMScriptGMNotificationControl;
 declare function GM_notification(
   /** Main text of the notification. */
   text: string,
@@ -221,7 +233,7 @@ declare function GM_notification(
   image?: string,
   /** Callback when the notification is clicked by user. */
   onclick?: () => void
-): VMScriptNotificationControl;
+): VMScriptGMNotificationControl;
 
 /** Sets data to system clipboard. */
 declare function GM_setClipboard(
@@ -254,8 +266,7 @@ declare interface VMScriptResponseObject<T> {
   context?: unknown;
 }
 
-/** Makes a request like XMLHttpRequest, with some special capabilities, not restricted by same-origin policy. */
-declare function GM_xmlhttpRequest<T>(details: {
+declare interface VMScriptGMXHRDetails<T> {
   /** URL relative to current page is also allowed. */
   url: string;
   /** HTTP method, default as `GET`. */
@@ -304,10 +315,12 @@ declare function GM_xmlhttpRequest<T>(details: {
   onprogress?: (resp: VMScriptResponseObject<T>) => void;
   onreadystatechange?: (resp: VMScriptResponseObject<T>) => void;
   ontimeout?: (resp: VMScriptResponseObject<T>) => void;
-}): VMScriptXHRControl;
+}
 
-/** Downloads a URL to a local file. */
-declare function GM_download(options: {
+/** Makes a request like XMLHttpRequest, with some special capabilities, not restricted by same-origin policy. */
+declare function GM_xmlhttpRequest<T>(details: VMScriptGMXHRDetails<T>): VMScriptXHRControl;
+
+declare interface VMScriptGMDownloadOptions {
   /** The URL to download. */
   url: string;
   /** The filename to save as. */
@@ -319,7 +332,10 @@ declare function GM_download(options: {
   onerror?: (resp: VMScriptResponseObject<Blob>) => void;
   onprogress?: (resp: VMScriptResponseObject<Blob>) => void;
   ontimeout?: (resp: VMScriptResponseObject<Blob>) => void;
-}): void;
+}
+
+/** Downloads a URL to a local file. */
+declare function GM_download(options: VMScriptGMDownloadOptions): void;
 declare function GM_download(
   /** The URL to download. */
   url: string,
