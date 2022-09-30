@@ -253,6 +253,10 @@ declare interface VMScriptXHRControl {
 
 declare type VMScriptResponseType = 'text' | 'json' | 'blob' | 'arraybuffer' | 'document';
 
+/**
+ * https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest#properties
+ * https://developer.mozilla.org/en-US/docs/Web/API/ProgressEvent#properties
+ */
 declare interface VMScriptResponseObject<T> {
   status: number;
   statusText: string;
@@ -262,6 +266,9 @@ declare interface VMScriptResponseObject<T> {
   responseText: string | null;
   /** The final URL after redirection. */
   finalUrl: string;
+  lengthComputable?: boolean;
+  loaded?: number;
+  total?: number;
   /** The same `context` object you specified in `details`. */
   context?: unknown;
 }
