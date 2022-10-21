@@ -13,15 +13,36 @@ declare interface VMScriptGMInfoPlatform {
   os: 'mac' | 'win' | 'android' | 'cros' | 'linux' | 'openbsd' | 'fuchsia';
 }
 
+/**
+ * GM_info.script and GM.info.script
+ * Non-optional string property will be an empty string '' if omitted.
+ */
 declare interface VMScriptGMInfoScriptMeta {
+  antifeature?: string[];
+  author?: string;
+  compatible?: string[];
+  connect?: string[];
   description: string;
+  downloadURL?: string;
+  excludeMatches: string[];
   excludes: string[];
+  /** Empty is the same as `@grant none` */
+  grant: string[];
+  /** Use homepageURL instead */
+  homepage?: string;
+  homepageURL?: string;
+  icon?: string;
   includes: string[];
   matches: string[];
   name: string;
   namespace: string;
-  resources: Array<{ name: string; url: string }>;
-  runAt: VMScriptRunAt;
+  noframes?: boolean;
+  require: string[];
+  resources: { name: string; url: string }[];
+  runAt: VMScriptRunAt | '';
+  supportURL?: string;
+  unwrap?: boolean;
+  updateURL?: string;
   version: string;
 }
 
@@ -53,6 +74,9 @@ declare interface VMScriptGMInfoObject {
  * An object that exposes information about the current userscript.
  */
 declare const GM_info: VMScriptGMInfoObject;
+
+/** The original console.log */
+declare function GM_log(...args: any): void;
 
 /** Retrieves a value for current script from storage. */
 declare function GM_getValue<T>(name: string, defaultValue?: T): T;
@@ -158,12 +182,12 @@ declare interface VMScriptGMTabOptions {
   /** Make the new tab active (i.e. open in foreground). Default as `true`. */
   active?: boolean;
   /**
-* Firefox only.
-*
-* - not specified = reuse script's tab container
-* - `0` = default (main) container
-* - `1`, `2`, etc. = internal container index
-*/
+   * Firefox only.
+   *
+   * - not specified = reuse script's tab container
+   * - `0` = default (main) container
+   * - `1`, `2`, etc. = internal container index
+   */
   container?: number;
   /** Insert the new tab next to the current tab and set its `openerTab` so when it's closed the original tab will be focused automatically. When `false` or not specified, the usual browser behavior is to open the tab at the end of the tab list. Default as `true`. */
   insert?: boolean;
@@ -192,7 +216,7 @@ declare function GM_registerMenuCommand(
   /** The name to show in the popup menu. */
   caption: string,
   /** Callback function when the command is clicked in the menu. */
-  onClick: (event: MouseEvent) => void
+  onClick: (event: MouseEvent | KeyboardEvent) => void
 ): string;
 /** Unregisters a command which has been registered to Violentmonkey popup menu. */
 declare function GM_unregisterMenuCommand(
@@ -350,15 +374,26 @@ declare function GM_download(
   name?: string
 ): void;
 
-declare interface VMScriptGMObject {
+/** Aliases for GM_ methods that are not included in Greasemonkey4 API */
+declare interface VMScriptGMObjectVMExtensions {
+  addElement: typeof GM_addElement;
+  addStyle: typeof GM_addStyle;
+  addValueChangeListener: typeof GM_addValueChangeListener;
+  download: typeof GM_download;
+  getResourceText: typeof GM_getResourceText;
+  log: typeof GM_log;
+  removeValueChangeListener: typeof GM_removeValueChangeListener;
+  unregisterMenuCommand: typeof GM_unregisterMenuCommand;
+}
+
+/** The Greasemonkey4 API, https://wiki.greasespot.net/Greasemonkey_Manual:API */
+declare interface VMScriptGMObject extends VMScriptGMObjectVMExtensions {
   unsafeWindow: Window;
   info: typeof GM_info;
   getValue: <T>(name: string, defaultValue?: T) => Promise<T>;
   setValue: <T>(name: string, value: T) => Promise<void>;
   deleteValue: (name: string) => Promise<void>;
   listValues: () => Promise<string[]>;
-  addStyle: typeof GM_addStyle;
-  addElement: typeof GM_addElement;
   registerMenuCommand: typeof GM_registerMenuCommand;
   getResourceUrl: (name: string, isBlobUrl?: boolean) => Promise<string>;
   notification: typeof GM_notification;
