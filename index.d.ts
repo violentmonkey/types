@@ -24,20 +24,20 @@ declare interface VMScriptGMInfoScriptMeta {
   connect?: string[];
   description: string;
   downloadURL?: string;
-  excludeMatches?: string[];
-  excludes?: string[];
-  /** Empty or omitted is the same as `@grant none` */
-  grant?: string[];
+  excludeMatches: string[];
+  excludes: string[];
+  /** Empty is the same as `@grant none` */
+  grant: string[];
   /** Use homepageURL instead */
   homepage?: string;
   homepageURL?: string;
   icon?: string;
-  includes?: string[];
-  matches?: string[];
+  includes: string[];
+  matches: string[];
   name: string;
   namespace: string;
   noframes?: boolean;
-  require?: string[];
+  require: string[];
   resources: { name: string; url: string }[];
   runAt: VMScriptRunAt | '';
   supportURL?: string;
