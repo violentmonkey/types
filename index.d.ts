@@ -287,7 +287,7 @@ declare interface VMScriptResponseObject<T = string | Blob | ArrayBuffer | Docum
   readyState: number;
   responseHeaders: string;
   response: T | null;
-  responseText: string | null;
+  responseText: string | undefined;
   responseXML: Document | null;
   /** The final URL after redirection. */
   finalUrl: string;
