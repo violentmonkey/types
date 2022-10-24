@@ -281,13 +281,14 @@ declare type VMScriptResponseType = 'text' | 'json' | 'blob' | 'arraybuffer' | '
  * https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest#properties
  * https://developer.mozilla.org/en-US/docs/Web/API/ProgressEvent#properties
  */
-declare interface VMScriptResponseObject<T> {
+declare interface VMScriptResponseObject<T = string | Blob | ArrayBuffer | Document | object> {
   status: number;
   statusText: string;
   readyState: number;
   responseHeaders: string;
-  response: T;
+  response: T | null;
   responseText: string | null;
+  responseXML: Document | null;
   /** The final URL after redirection. */
   finalUrl: string;
   lengthComputable?: boolean;
