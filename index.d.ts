@@ -281,7 +281,7 @@ declare type VMScriptResponseType = 'text' | 'json' | 'blob' | 'arraybuffer' | '
  * https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest#properties
  * https://developer.mozilla.org/en-US/docs/Web/API/ProgressEvent#properties
  */
-declare interface VMScriptResponseObject<T = string | Blob | ArrayBuffer | Document | object> {
+declare interface VMScriptResponseObject<T> {
   status: number;
   statusText: string;
   readyState: number;
@@ -298,7 +298,7 @@ declare interface VMScriptResponseObject<T = string | Blob | ArrayBuffer | Docum
   context?: unknown;
 }
 
-declare interface VMScriptGMXHRDetails<T> {
+declare interface VMScriptGMXHRDetails<T = string | Blob | ArrayBuffer | Document | object> {
   /** URL relative to current page is also allowed. */
   url: string;
   /** HTTP method, default as `GET`. */
@@ -350,20 +350,11 @@ declare interface VMScriptGMXHRDetails<T> {
 }
 
 /** Makes a request like XMLHttpRequest, with some special capabilities, not restricted by same-origin policy. */
-declare function GM_xmlhttpRequest<T>(details: VMScriptGMXHRDetails<T>): VMScriptXHRControl;
+declare function GM_xmlhttpRequest(details: VMScriptGMXHRDetails): VMScriptXHRControl;
 
-declare interface VMScriptGMDownloadOptions {
-  /** The URL to download. */
-  url: string;
+declare interface VMScriptGMDownloadOptions extends Omit<VMScriptGMXHRDetails<Blob>, 'binary' | 'data' | 'method' | 'overrideMimeType' | 'responseType'> {
   /** The filename to save as. */
-  name?: string;
-  /** The function to call when download starts successfully. */
-  onload?: () => void;
-  headers?: Record<string, string>;
-  timeout?: number;
-  onerror?: (resp: VMScriptResponseObject<Blob>) => void;
-  onprogress?: (resp: VMScriptResponseObject<Blob>) => void;
-  ontimeout?: (resp: VMScriptResponseObject<Blob>) => void;
+  name: string;
 }
 
 /** Downloads a URL to a local file. */
@@ -372,7 +363,7 @@ declare function GM_download(
   /** The URL to download. */
   url: string,
   /** The filename to save as. */
-  name?: string
+  name: string
 ): void;
 
 /** Aliases for GM_ methods that are not included in Greasemonkey4 API */
