@@ -298,7 +298,7 @@ declare interface VMScriptResponseObject<T> {
   context?: unknown;
 }
 
-interface GMRequestBase<T = string | Blob | ArrayBuffer | Document | object> {
+interface GMRequestBase<T> {
   /** URL relative to current page is also allowed. */
   url: string;
   /** User for authentication. */
@@ -353,7 +353,9 @@ declare interface VMScriptGMXHRDetails<T> extends GMRequestBase<T> {
 }
 
 /** Makes a request like XMLHttpRequest, with some special capabilities, not restricted by same-origin policy. */
-declare function GM_xmlhttpRequest<T>(details: VMScriptGMXHRDetails<T>): VMScriptXHRControl;
+declare function GM_xmlhttpRequest<T = string | Blob | ArrayBuffer | Document | object>(
+  details: VMScriptGMXHRDetails<T>
+): VMScriptXHRControl;
 
 declare interface VMScriptGMDownloadOptions extends GMRequestBase<Blob> {
   /** The filename to save as. */
