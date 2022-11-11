@@ -281,7 +281,7 @@ declare type VMScriptResponseType = 'text' | 'json' | 'blob' | 'arraybuffer' | '
  * https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest#properties
  * https://developer.mozilla.org/en-US/docs/Web/API/ProgressEvent#properties
  */
-declare interface VMScriptResponseObject<T = string | Blob | ArrayBuffer | Document | object> {
+declare interface VMScriptResponseObject<T> {
   status: number;
   statusText: string;
   readyState: number;
@@ -298,17 +298,13 @@ declare interface VMScriptResponseObject<T = string | Blob | ArrayBuffer | Docum
   context?: unknown;
 }
 
-declare interface VMScriptGMXHRDetails<T> {
+interface GMRequestBase<T> {
   /** URL relative to current page is also allowed. */
   url: string;
-  /** HTTP method, default as `GET`. */
-  method?: string;
   /** User for authentication. */
   user?: string;
   /** Password for authentication. */
   password?: string;
-  /** A MIME type to specify with the request. */
-  overrideMimeType?: string;
   /**
    * Some special headers are also allowed:
    *
@@ -319,22 +315,8 @@ declare interface VMScriptGMXHRDetails<T> {
    * - `User-Agent`
    */
   headers?: Record<string, string>;
-  /**
-   * One of the following:
-   *
-   * - `text` (default value)
-   * - `json`
-   * - `blob`
-   * - `arraybuffer`
-   * - `document`
-   */
-  responseType?: VMScriptResponseType;
   /** Time to wait for the request, none by default. */
   timeout?: number;
-  /** Data to send with the request, usually for `POST` and `PUT` requests. */
-  data?: string | FormData | Blob;
-  /** Send the `data` string as a `blob`. This is for compatibility with Tampermonkey/Greasemonkey, where only `string` type is allowed in `data`. */
-  binary?: boolean;
   /** Can be an object and will be assigned to context of the response object. */
   context?: unknown;
   /** When set to `true`, no cookie will be sent with the request and the response cookies will be ignored. The default value is `false`. */
@@ -349,21 +331,35 @@ declare interface VMScriptGMXHRDetails<T> {
   ontimeout?: (resp: VMScriptResponseObject<T>) => void;
 }
 
-/** Makes a request like XMLHttpRequest, with some special capabilities, not restricted by same-origin policy. */
-declare function GM_xmlhttpRequest<T>(details: VMScriptGMXHRDetails<T>): VMScriptXHRControl;
+declare interface VMScriptGMXHRDetails<T> extends GMRequestBase<T> {
+  /** HTTP method, default as `GET`. */
+  method?: string;
+  /** A MIME type to specify with the request. */
+  overrideMimeType?: string;
+  /**
+   * One of the following:
+   *
+   * - `text` (default value)
+   * - `json`
+   * - `blob`
+   * - `arraybuffer`
+   * - `document`
+   */
+  responseType?: VMScriptResponseType;
+  /** Data to send with the request, usually for `POST` and `PUT` requests. */
+  data?: string | ArrayBuffer | Blob | DataView | FormData | ReadableStream | TypedArray | URLSearchParams;
+  /** Send the `data` string as a `blob`. This is for compatibility with Tampermonkey/Greasemonkey, where only `string` type is allowed in `data`. */
+  binary?: boolean;
+}
 
-declare interface VMScriptGMDownloadOptions {
-  /** The URL to download. */
-  url: string;
+/** Makes a request like XMLHttpRequest, with some special capabilities, not restricted by same-origin policy. */
+declare function GM_xmlhttpRequest<T = string | Blob | ArrayBuffer | Document | object>(
+  details: VMScriptGMXHRDetails<T>
+): VMScriptXHRControl;
+
+declare interface VMScriptGMDownloadOptions extends GMRequestBase<Blob> {
   /** The filename to save as. */
-  name?: string;
-  /** The function to call when download starts successfully. */
-  onload?: () => void;
-  headers?: Record<string, string>;
-  timeout?: number;
-  onerror?: (resp: VMScriptResponseObject<Blob>) => void;
-  onprogress?: (resp: VMScriptResponseObject<Blob>) => void;
-  ontimeout?: (resp: VMScriptResponseObject<Blob>) => void;
+  name: string;
 }
 
 /** Downloads a URL to a local file. */
@@ -372,7 +368,7 @@ declare function GM_download(
   /** The URL to download. */
   url: string,
   /** The filename to save as. */
-  name?: string
+  name: string
 ): void;
 
 /** Aliases for GM_ methods that are not included in Greasemonkey4 API */
