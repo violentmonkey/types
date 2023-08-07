@@ -240,8 +240,25 @@ declare interface VMScriptGMNotificationOptions {
   title?: string;
   /** URL of an image to show in the notification. */
   image?: string;
-  /** No sounds/vibrations when showing the notification. Since VM2.15.2, Chrome 70. */
+  /** No sounds/vibrations when showing the notification.
+   * @since VM2.15.2, Chrome 70. */
   silent?: boolean;
+  /**
+   * Unique name of the notification, e.g. 'abc', same as the web Notification API.
+   * Names are scoped to each userscript i.e. your tag won't clash with another script's tag.
+   * The purpose of a tagged notification is to replace an older notification with the same tag,
+   * even if it was shown in another tab (or before this tab was navigated elsewhere
+   * and your notification had `zombieTimeout`).
+   * @since VM2.15.4
+   */
+  tag?: string;
+  /**
+   * Number of milliseconds to keep the notification after the userscript "dies",
+   * i.e. when its tab or frame is reloaded/closed/navigated. If not specified or invalid,
+   * the default behavior is to immediately remove the notifications.
+   * @since VM2.15.4
+   */
+  zombieTimeout?: number;
   /** Callback when the notification is clicked by user. */
   onclick?: () => void;
   /** Callback when the notification is closed, either by user or by system. */
