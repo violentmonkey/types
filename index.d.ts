@@ -240,6 +240,8 @@ declare interface VMScriptGMNotificationOptions {
   title?: string;
   /** URL of an image to show in the notification. */
   image?: string;
+  /** No sounds/vibrations when showing the notification. Since VM2.15.2, Chrome 70. */
+  silent?: boolean;
   /** Callback when the notification is clicked by user. */
   onclick?: () => void;
   /** Callback when the notification is closed, either by user or by system. */
