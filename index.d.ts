@@ -7,9 +7,22 @@ declare type VMScriptInjectInto = 'auto' | 'page' | 'content';
 
 declare interface VMScriptGMInfoPlatform {
   arch: 'arm' | 'arm64' | 'x86-32' | 'x86-64' | 'mips' | 'mips64';
-  /** `chrome`, `firefox` or whatever was returned by the API. */
-  browserName: string;
+  /** @alias browserBrand
+   * @since VM2.15.7, Chrome 90 */
+  brand: string;
+  /**
+   * The most meaningful pick (i.e. non-generic) from navigator.userAgentData.brands or ''.
+   * @since VM2.15.7, Chrome 90
+   */
+  browserBrand: string;
+  browserName: 'chrome' | 'firefox' | string;
   browserVersion: string;
+  /** @alias browserName
+   * @since VM2.15.7 */
+  name: string;
+  /** @alias browserVersion
+   * @since VM2.15.7 */
+  version: string;
   os: 'mac' | 'win' | 'android' | 'cros' | 'linux' | 'openbsd' | 'fuchsia';
 }
 
