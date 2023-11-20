@@ -284,6 +284,11 @@ declare interface VMScriptGMNotificationOptions {
    * @since VM2.15.4
    */
   zombieTimeout?: number;
+  /**
+   * URL to open when a zombie notification is clicked, see `zombieTimeout` for more info.
+   * @since VM2.16.1
+   */
+  zombieUrl?: string;
   /** Callback when the notification is clicked by user. */
   onclick?: () => void;
   /** Callback when the notification is closed, either by user or by system. */
