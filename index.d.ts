@@ -223,8 +223,7 @@ declare function GM_openInTab(
 
 /**
  * Registers a command in Violentmonkey popup menu.
- * Returns the `caption` parameter in VM2.12.5...VM2.15.8.
- * Returns the `id` parameter or a generated random id since VM2.15.9.
+ * Returns the command's id since VM2.12.5, see description of the `id` parameter.
  * If you want to add a shortcut, please see `@violentmonkey/shortcut`.
  */
 declare function GM_registerMenuCommand(
@@ -234,11 +233,12 @@ declare function GM_registerMenuCommand(
   onClick: (event: MouseEvent | KeyboardEvent) => void,
   /** @since VM2.15.9 */
   options?: {
-    /** If not specified, a new random id is generated. */
+    /** Default: the `caption` parameter.
+     * In 2.15.9-2.16.1 the default was a randomly generated string. */
     id?: string,
     /** A hint shown in the status bar when hovering the command. */
     title?: string,
-    /** @default true
+    /** Default: `true`.
      * Whether to auto-close the popup after the user invoked the command. */
     autoClose?: boolean,
   }
