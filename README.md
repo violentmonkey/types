@@ -14,13 +14,12 @@ The APIs should be almost the same as those in Tampermonkey, so `@types/tampermo
 $ npm i @violentmonkey/types
 ```
 
-Add `@violentmonkey/types` to your `tsconfig.json`:
+Add `@violentmonkey/types` to a `.d.ts` file.
 
-```json
-{
-  "include": [
-    "other paths...",
-    "node_modules/@violentmonkey/types"
-  ]
-}
+For example, create `src/vm.d.ts` with the following content:
+
+```typescript
+import '@violentmonkey/types';
 ```
+
+Make sure the `.d.ts` file is included in your `tsconfig.json`.
