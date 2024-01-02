@@ -1,9 +1,14 @@
 name: doc
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
+    paths:
+      - package.json
+      - index.d.ts
+      - README.md
 
 jobs:
   build:
@@ -17,21 +22,15 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: '20'
-      - uses: marceloprado/has-changed-path@v1
-        id: changed-d-ts
-        with:
-          paths: package.json index.d.ts
       - uses: pnpm/action-setup@v2
         with:
           version: 8
       - name: Build docs
-        if: steps.changed-d-ts.outputs.changed == 'true'
         run: |
           pnpm i
           pnpm build:docs
           pnpm build:docs --json docs/types.json
       - name: Deploy to GitHub Pages
-        if: steps.changed-d-ts.outputs.changed == 'true'
         uses: JamesIves/github-pages-deploy-action@4.0.0
         with:
           branch: gh-pages
