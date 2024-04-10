@@ -438,7 +438,9 @@ declare interface VMScriptGMObjectVMExtensions {
   addElement: typeof GM_addElement;
   addStyle: typeof GM_addStyle;
   addValueChangeListener: typeof GM_addValueChangeListener;
-  download: typeof GM_download;
+  download:
+    ((options: VMScriptGMDownloadOptions) => (Promise<Blob> | void)) |
+    ((url: string, name: string) => (Promise<Blob> | void));
   getResourceText: typeof GM_getResourceText;
   log: typeof GM_log;
   removeValueChangeListener: typeof GM_removeValueChangeListener;
@@ -458,7 +460,9 @@ declare interface VMScriptGMObject extends VMScriptGMObjectVMExtensions {
   notification: typeof GM_notification;
   openInTab: typeof GM_openInTab;
   setClipboard: typeof GM_setClipboard;
-  xmlHttpRequest: typeof GM_xmlhttpRequest;
+  xmlHttpRequest: <T = string | Blob | ArrayBuffer | Document | object>(
+    details: VMScriptGMXHRDetails<T>
+  ) => (Promise<T> & VMScriptXHRControl);
 }
 
 declare const GM: VMScriptGMObject;
