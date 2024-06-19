@@ -5,6 +5,8 @@ declare type VMScriptRunAt = 'document-start' | 'document-body' | 'document-end'
 /** Injection mode of a script. */
 declare type VMScriptInjectInto = 'auto' | 'page' | 'content';
 
+declare type GenericObject = Record<string, unknown>;
+
 declare interface VMScriptGMInfoPlatform {
   arch: 'arm' | 'arm64' | 'x86-32' | 'x86-64' | 'mips' | 'mips64';
   /** @alias browserBrand
@@ -93,10 +95,18 @@ declare function GM_log(...args: any): void;
 
 /** Retrieves a value for current script from storage. */
 declare function GM_getValue<T>(name: string, defaultValue?: T): T;
+/** @since VM2.19.1 */
+declare function GM_getValues(names: string[]): GenericObject;
+/** @since VM2.19.1 */
+declare function GM_getValues(namesWithDefaults: GenericObject): GenericObject;
 /** Sets a key / value pair for current script to storage. */
 declare function GM_setValue<T>(name: string, value: T): void;
+/** @since VM2.19.1 */
+declare function GM_setValues(values: GenericObject): void;
 /** Deletes an existing key / value pair for current script from storage. */
 declare function GM_deleteValue(name: string): void;
+/** @since VM2.19.1 */
+declare function GM_deleteValues(names: string[]): void;
 /** Returns an array of keys of all available values within this script. */
 declare function GM_listValues(): string[];
 
@@ -438,12 +448,20 @@ declare interface VMScriptGMObjectVMExtensions {
   addElement: typeof GM_addElement;
   addStyle: typeof GM_addStyle;
   addValueChangeListener: typeof GM_addValueChangeListener;
+  /** @since VM2.19.1 */
+  deleteValues: (names: string[]) => Promise<void>;
   download:
     ((options: VMScriptGMDownloadOptions) => (Promise<Blob> | void)) |
     ((url: string, name: string) => (Promise<Blob> | void));
   getResourceText: typeof GM_getResourceText;
+  /** @since VM2.19.1 */
+  getValues:
+    ((names: string[]) => Promise<GenericObject>) |
+    ((namesWithDefaults: GenericObject) => Promise<GenericObject>);
   log: typeof GM_log;
   removeValueChangeListener: typeof GM_removeValueChangeListener;
+  /** @since VM2.19.1 */
+  setValues: (values: GenericObject) => Promise<void>;
   unregisterMenuCommand: typeof GM_unregisterMenuCommand;
 }
 
