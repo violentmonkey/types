@@ -71,11 +71,13 @@ declare interface VMScriptGMInfoObject {
   platform: VMScriptGMInfoPlatform;
   /**
    * A copy of navigator.userAgentData from the content script of the extension.
+   * Not present in browsers that don't implement this API.
    * @since VM2.20.2 */
   userAgentData?: {
     brands: {brand: string, version: string}[],
     mobile: boolean,
     platform: string,
+    getHighEntropyValues(hints: string[]): Promise<UADataValues>,
   };
 }
 

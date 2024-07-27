@@ -23,6 +23,7 @@
   "repository": "git@github.com:violentmonkey/types.git",
   "devDependencies": {
     "typedoc": "^0.25.6",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "user-agent-data-types": "^0.4.2"
   }
 }
