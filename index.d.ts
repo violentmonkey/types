@@ -8,23 +8,9 @@ declare type VMScriptInjectInto = 'auto' | 'page' | 'content';
 declare type GenericObject = Record<string, unknown>;
 
 declare interface VMScriptGMInfoPlatform {
-  arch: 'arm' | 'arm64' | 'x86-32' | 'x86-64' | 'mips' | 'mips64';
-  /** @alias browserBrand
-   * @since VM2.15.7, Chrome 90 */
-  brand: string;
-  /**
-   * The most meaningful pick (i.e. non-generic) from navigator.userAgentData.brands or ''.
-   * @since VM2.15.7, Chrome 90
-   */
-  browserBrand: string;
+  arch: 'aarch64' | 'arm' | 'arm64' | 'mips' | 'mips64' | 'ppc64' | 's390x' | 'sparc64' | 'x86-32' | 'x86-64';
   browserName: 'chrome' | 'firefox' | string;
   browserVersion: string;
-  /** @alias browserName
-   * @since VM2.15.7 */
-  name: string;
-  /** @alias browserVersion
-   * @since VM2.15.7 */
-  version: string;
   os: 'mac' | 'win' | 'android' | 'cros' | 'linux' | 'openbsd' | 'fuchsia';
 }
 
@@ -64,6 +50,10 @@ declare interface VMScriptGMInfoScriptMeta {
 declare interface VMScriptGMInfoObject {
   /** Unique ID of the script. */
   uuid: string;
+  /** The injection mode of current script. */
+  injectInto: VMScriptInjectInto;
+  /** Contains structured fields from the *Metadata Block*. */
+  script: VMScriptGMInfoScriptMeta;
   /** The meta block of the script. */
   scriptMetaStr: string;
   /** Whether the script will be updated automatically. */
@@ -79,10 +69,14 @@ declare interface VMScriptGMInfoObject {
    * extension API (`browser.runtime.getPlatformInfo` and `getBrowserInfo`).
    */
   platform: VMScriptGMInfoPlatform;
-  /** Contains structured fields from the *Metadata Block*. */
-  script: VMScriptGMInfoScriptMeta;
-  /** The injection mode of current script. */
-  injectInto: VMScriptInjectInto;
+  /**
+   * A copy of navigator.userAgentData from the content script of the extension.
+   * @since VM2.20.2 */
+  userAgentData?: {
+    brands: {brand: string, version: string}[],
+    mobile: boolean,
+    platform: string,
+  };
 }
 
 /**
