@@ -70,6 +70,10 @@ declare interface VMScriptGMInfoObject {
    */
   platform: VMScriptGMInfoPlatform;
   /**
+   * A copy of navigator.userAgent from the content script of the extension.
+   * @since VM2.20.2 */
+  userAgent: string;
+  /**
    * A copy of navigator.userAgentData from the content script of the extension.
    * Not present in browsers that don't implement this API.
    * @since VM2.20.2 */
