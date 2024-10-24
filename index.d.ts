@@ -11,6 +11,18 @@ declare interface VMScriptGMInfoPlatform {
   arch: 'aarch64' | 'arm' | 'arm64' | 'mips' | 'mips64' | 'ppc64' | 's390x' | 'sparc64' | 'x86-32' | 'x86-64';
   browserName: 'chrome' | 'firefox' | string;
   browserVersion: string;
+  /**
+   * A copy of `navigator.userAgentData.getHighEntropyValues()` from the background script
+   * of the extension, so it's not affected by devtools of the web page tab.
+   * Not present in browsers that don't implement this API.
+   * @since VM2.27.0 */
+  fullVersionList?: {brand: string, version: string}[];
+  /**
+   * A copy of `navigator.userAgentData.mobile` from the background script of the extension,
+   * so it's not affected by devtools of the web page tab.
+   * Not present in browsers that don't implement this API.
+   * @since VM2.27.0 */
+  mobile?: boolean;
   os: 'mac' | 'win' | 'android' | 'cros' | 'linux' | 'openbsd' | 'fuchsia';
 }
 
