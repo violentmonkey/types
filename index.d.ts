@@ -1,6 +1,10 @@
 declare const unsafeWindow: Window;
 
-declare type VMScriptRunAt = 'document-start' | 'document-body' | 'document-end' | 'document-idle';
+declare type VMScriptRunAt =
+  | 'document-start'
+  | 'document-body'
+  | 'document-end'
+  | 'document-idle';
 
 /** Injection mode of a script. */
 declare type VMScriptInjectInto = 'auto' | 'page' | 'content';
@@ -8,20 +12,32 @@ declare type VMScriptInjectInto = 'auto' | 'page' | 'content';
 declare type GenericObject = Record<string, unknown>;
 
 declare interface VMScriptGMInfoPlatform {
-  arch: 'aarch64' | 'arm' | 'arm64' | 'mips' | 'mips64' | 'ppc64' | 's390x' | 'sparc64' | 'x86-32' | 'x86-64';
+  arch:
+    | 'aarch64'
+    | 'arm'
+    | 'arm64'
+    | 'mips'
+    | 'mips64'
+    | 'ppc64'
+    | 's390x'
+    | 'sparc64'
+    | 'x86-32'
+    | 'x86-64';
   browserName: 'chrome' | 'firefox' | string;
   browserVersion: string;
   /**
    * A copy of `navigator.userAgentData.getHighEntropyValues()` from the background script
    * of the extension, so it's not affected by devtools of the web page tab.
-   * Not present in browsers that don't implement this API.
-   * @since VM2.27.0 */
-  fullVersionList?: {brand: string, version: string}[];
+   * Only present in browsers that implement this API (Chromium >= 90).
+   * @since VM2.27.0
+   */
+  fullVersionList?: { brand: string; version: string }[];
   /**
    * A copy of `navigator.userAgentData.mobile` from the background script of the extension,
    * so it's not affected by devtools of the web page tab.
-   * Not present in browsers that don't implement this API.
-   * @since VM2.27.0 */
+   * Only present in browsers that implement this API (Chromium >= 90).
+   * @since VM2.27.0
+   */
   mobile?: boolean;
   os: 'mac' | 'win' | 'android' | 'cros' | 'linux' | 'openbsd' | 'fuchsia';
 }
@@ -60,11 +76,11 @@ declare interface VMScriptGMInfoScriptMeta {
 }
 
 declare interface VMScriptGMInfoObject {
-  /** Unique ID of the script. */
+  /** A unique ID of the script. */
   uuid: string;
-  /** The injection mode of current script. */
+  /** The injection mode of current script. See [`@inject-into`](https://violentmonkey.github.io/api/metadata-block/#inject-into) for more information. */
   injectInto: VMScriptInjectInto;
-  /** Contains structured fields from the *Metadata Block*. */
+  /** Contains structured fields from the [Metadata Block](https://violentmonkey.github.io/api/metadata-block/). */
   script: VMScriptGMInfoScriptMeta;
   /** The meta block of the script. */
   scriptMetaStr: string;
@@ -75,6 +91,11 @@ declare interface VMScriptGMInfoObject {
   /** Version of Violentmonkey. */
   version: string;
   /**
+   * True when this is an incognito profile (Chrome) or private mode (Firefox).
+   * @since VM2.15.4
+   */
+  isIncognito: boolean;
+  /**
    * Unlike `navigator.userAgent`, which can be overriden by other extensions/userscripts
    * or by devtools in device-emulation mode, `GM_info.platform` is more reliable as the
    * data is obtained in the background page of Violentmonkey using a specialized
@@ -82,18 +103,34 @@ declare interface VMScriptGMInfoObject {
    */
   platform: VMScriptGMInfoPlatform;
   /**
-   * A copy of navigator.userAgent from the content script of the extension.
-   * @since VM2.20.2 */
+   * A safe copy of `navigator.userAgent` from the content script of the extension,
+   * so it cannot be overridden by other extensions/userscripts, but unlike
+   * `GM_info.platform` it can be customized in devtools “device emulation” or
+   * “network conditions” for this tab.
+   * @since VM2.20.2
+   */
   userAgent: string;
   /**
-   * A copy of navigator.userAgentData from the content script of the extension.
-   * Not present in browsers that don't implement this API.
-   * @since VM2.20.2 */
+   * A safe copy of `navigator.userAgentData` from the content script of the extension,
+   * so it cannot be overridden by other extensions/userscripts, but unlike
+   * `GM_info.platform` it can be customized in devtools "device emulation" or
+   * "network conditions" for this tab.
+   *
+   * Only present if the browser actually implements it
+   * ([currently](https://caniuse.com/mdn-api_navigator_useragentdata) Chromium-based 90+),
+   * because there's no reliable/official polyfill.
+   *
+   * Violentmonkey implements the [official API](https://developer.mozilla.org/en-US/docs/Web/API/NavigatorUAData),
+   * including [getHighEntropyValues](https://developer.mozilla.org/en-US/docs/Web/API/NavigatorUAData/getHighEntropyValues)
+   * function to obtain the extra info asynchronously.
+   *
+   * @since VM2.20.2
+   */
   userAgentData?: {
-    brands: {brand: string, version: string}[],
-    mobile: boolean,
-    platform: string,
-    getHighEntropyValues(hints: string[]): Promise<UADataValues>,
+    brands: { brand: string; version: string }[];
+    mobile: boolean;
+    platform: string;
+    getHighEntropyValues(hints: string[]): Promise<UADataValues>;
   };
 }
 
@@ -130,13 +167,13 @@ declare type VMScriptGMValueChangeCallback<T> = (
   /** The new value of the observed variable (`undefined` if it was deleted) */
   newValue: T,
   /** `true` if modified by the userscript instance of another tab or `false` for this script instance. Can be used by scripts of different browser tabs to communicate with each other. */
-  remote: boolean
+  remote: boolean,
 ) => void;
 
 /** Adds a change listener to the storage and returns the listener ID. */
 declare function GM_addValueChangeListener<T>(
   name: string,
-  callback: VMScriptGMValueChangeCallback<T>
+  callback: VMScriptGMValueChangeCallback<T>,
 ): string;
 /** Removes a change listener by its ID. */
 declare function GM_removeValueChangeListener(listenerId: string): void;
@@ -144,7 +181,7 @@ declare function GM_removeValueChangeListener(listenerId: string): void;
 /** Retrieves a text resource from the *Metadata Block*. */
 declare function GM_getResourceText(
   /** Name of a resource defined in the *Metadata Block*. */
-  name: string
+  name: string,
 ): string;
 /**
  * Retrieves a `blob:` or `data:` URL of a resource from the *Metadata Block*.
@@ -158,7 +195,7 @@ declare function GM_getResourceURL(
    * - If `true`, returns a `blob:` URL. It's short and cacheable, so it's good for reusing in multiple DOM elements.
    * - If `false`, returns a `data:` URL. It's long so reusing it in DOM may be less performant due to the lack of caching, but it's particularly handy for direct synchronous decoding of the data on sites that forbid fetching `blob:` in their CSP.
    */
-  isBlobUrl?: boolean
+  isBlobUrl?: boolean,
 ): string;
 
 /**
@@ -182,7 +219,7 @@ declare function GM_addElement(
   /** A tag name like `script`. Any valid HTML tag can be used, but the only motivation for this API was to add `script`, `link`, `style` elements when they are disallowed by a strict `Content-Security-Policy` of the site e.g. github.com, twitter.com. */
   tagName: string,
   /** The keys are HTML attributes, not DOM properties, except `textContent` which sets DOM property `textContent`. The values are strings so if you want to assign a private function to `onload` you can do it after the element is created. */
-  attributes?: Record<string, string>
+  attributes?: Record<string, string>,
 ): HTMLElement;
 declare function GM_addElement(
   /**
@@ -198,7 +235,7 @@ declare function GM_addElement(
   /** A tag name like `script`. Any valid HTML tag can be used, but the only motivation for this API was to add `script`, `link`, `style` elements when they are disallowed by a strict `Content-Security-Policy` of the site e.g. github.com, twitter.com. */
   tagName: string,
   /** The keys are HTML attributes, not DOM properties, except `textContent` which sets DOM property `textContent`. The values are strings so if you want to assign a private function to `onload` you can do it after the element is created. */
-  attributes?: Record<string, string>
+  attributes?: Record<string, string>,
 ): HTMLElement;
 
 /** Appends and returns a `<style>` element with the specified CSS. */
@@ -234,13 +271,13 @@ declare interface VMScriptGMTabOptions {
 declare function GM_openInTab(
   /** The URL to open in a new tab. URL relative to current page is also allowed. Note: Firefox does not support data URLs. */
   url: string,
-  options?: VMScriptGMTabOptions
+  options?: VMScriptGMTabOptions,
 ): VMScriptGMTabControl;
 declare function GM_openInTab(
   /** The URL to open in a new tab. URL relative to current page is also allowed. Note: Firefox does not support data URLs. */
   url: string,
   /** Open the tab in background. Note, this is a reverse of the first usage method so for example `true` is the same as `{ active: false }`. */
-  openInBackground?: boolean
+  openInBackground?: boolean,
 ): VMScriptGMTabControl;
 
 /**
@@ -257,18 +294,18 @@ declare function GM_registerMenuCommand(
   options?: {
     /** Default: the `caption` parameter.
      * In 2.15.9-2.16.1 the default was a randomly generated string. */
-    id?: string,
+    id?: string;
     /** A hint shown in the status bar when hovering the command. */
-    title?: string,
+    title?: string;
     /** Default: `true`.
      * Whether to auto-close the popup after the user invoked the command. */
-    autoClose?: boolean,
-  }
+    autoClose?: boolean;
+  },
 ): string;
 /** Unregisters a command which has been registered to Violentmonkey popup menu. */
 declare function GM_unregisterMenuCommand(
   /** The name of command to unregister. */
-  caption: string
+  caption: string,
 ): void;
 
 /**
@@ -318,7 +355,9 @@ declare interface VMScriptGMNotificationOptions {
 }
 
 /** Shows an HTML5 desktop notification. */
-declare function GM_notification(options: VMScriptGMNotificationOptions): VMScriptGMNotificationControl;
+declare function GM_notification(
+  options: VMScriptGMNotificationOptions,
+): VMScriptGMNotificationControl;
 declare function GM_notification(
   /** Main text of the notification. */
   text: string,
@@ -327,7 +366,7 @@ declare function GM_notification(
   /** URL of an image to show in the notification. */
   image?: string,
   /** Callback when the notification is clicked by user. */
-  onclick?: () => void
+  onclick?: () => void,
 ): VMScriptGMNotificationControl;
 
 /** Sets data to system clipboard. */
@@ -335,7 +374,7 @@ declare function GM_setClipboard(
   /** The data to be copied to system clipboard. */
   data: string,
   /** The MIME type of data to copy. Default as `text/plain`. */
-  type?: string
+  type?: string,
 ): void;
 
 /**
@@ -346,7 +385,12 @@ declare interface VMScriptXHRControl {
   abort: () => void;
 }
 
-declare type VMScriptResponseType = 'text' | 'json' | 'blob' | 'arraybuffer' | 'document';
+declare type VMScriptResponseType =
+  | 'text'
+  | 'json'
+  | 'blob'
+  | 'arraybuffer'
+  | 'document';
 
 /**
  * https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest#properties
@@ -370,17 +414,17 @@ declare interface VMScriptResponseObject<T> {
 }
 
 type TypedArray =
-    | Uint8Array
-    | Uint8ClampedArray
-    | Uint16Array
-    | Uint32Array
-    | Int8Array
-    | Int16Array
-    | Int32Array
-    | BigUint64Array
-    | BigInt64Array
-    | Float32Array
-    | Float64Array;
+  | Uint8Array
+  | Uint8ClampedArray
+  | Uint16Array
+  | Uint32Array
+  | Int8Array
+  | Int16Array
+  | Int32Array
+  | BigUint64Array
+  | BigInt64Array
+  | Float32Array
+  | Float64Array;
 
 interface GMRequestBase<T> {
   /** URL relative to current page is also allowed. */
@@ -431,15 +475,23 @@ declare interface VMScriptGMXHRDetails<T> extends GMRequestBase<T> {
    */
   responseType?: VMScriptResponseType;
   /** Data to send with the request, usually for `POST` and `PUT` requests. */
-  data?: string | ArrayBuffer | Blob | DataView | FormData | ReadableStream | TypedArray | URLSearchParams;
+  data?:
+    | string
+    | ArrayBuffer
+    | Blob
+    | DataView
+    | FormData
+    | ReadableStream
+    | TypedArray
+    | URLSearchParams;
   /** Send the `data` string as a `blob`. This is for compatibility with Tampermonkey/Greasemonkey, where only `string` type is allowed in `data`. */
   binary?: boolean;
 }
 
 /** Makes a request like XMLHttpRequest, with some special capabilities, not restricted by same-origin policy. */
-declare function GM_xmlhttpRequest<T = string | Blob | ArrayBuffer | Document | object>(
-  details: VMScriptGMXHRDetails<T>
-): VMScriptXHRControl;
+declare function GM_xmlhttpRequest<
+  T = string | Blob | ArrayBuffer | Document | object,
+>(details: VMScriptGMXHRDetails<T>): VMScriptXHRControl;
 
 declare interface VMScriptGMDownloadOptions extends GMRequestBase<Blob> {
   /** The filename to save as. */
@@ -452,7 +504,7 @@ declare function GM_download(
   /** The URL to download. */
   url: string,
   /** The filename to save as. */
-  name: string
+  name: string,
 ): void;
 
 /** Aliases for GM_ methods that are not included in Greasemonkey4 API */
@@ -463,13 +515,13 @@ declare interface VMScriptGMObjectVMExtensions {
   /** @since VM2.19.1 */
   deleteValues: (names: string[]) => Promise<void>;
   download:
-    ((options: VMScriptGMDownloadOptions) => (Promise<Blob> | void)) |
-    ((url: string, name: string) => (Promise<Blob> | void));
+    | ((options: VMScriptGMDownloadOptions) => Promise<Blob> | void)
+    | ((url: string, name: string) => Promise<Blob> | void);
   getResourceText: typeof GM_getResourceText;
   /** @since VM2.19.1 */
   getValues:
-    ((names: string[]) => Promise<GenericObject>) |
-    ((namesWithDefaults: GenericObject) => Promise<GenericObject>);
+    | ((names: string[]) => Promise<GenericObject>)
+    | ((namesWithDefaults: GenericObject) => Promise<GenericObject>);
   log: typeof GM_log;
   removeValueChangeListener: typeof GM_removeValueChangeListener;
   /** @since VM2.19.1 */
@@ -491,8 +543,8 @@ declare interface VMScriptGMObject extends VMScriptGMObjectVMExtensions {
   openInTab: typeof GM_openInTab;
   setClipboard: typeof GM_setClipboard;
   xmlHttpRequest: <T = string | Blob | ArrayBuffer | Document | object>(
-    details: VMScriptGMXHRDetails<T>
-  ) => (Promise<T> & VMScriptXHRControl);
+    details: VMScriptGMXHRDetails<T>,
+  ) => Promise<T> & VMScriptXHRControl;
 }
 
 declare const GM: VMScriptGMObject;
