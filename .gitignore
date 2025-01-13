@@ -2,3 +2,4 @@ node_modules/
 *.lock
 pnpm-lock.yaml
 /docs
+/index.json
