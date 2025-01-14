@@ -15,6 +15,19 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Rebuild website
+        run: |
+          curl -fsS \
+          -H 'Accept: application/vnd.github.everest-preview+json' \
+          -H 'Content-type: application/json' \
+          -H "Authorization: Bearer $GH_PAT_ORG" \
+          -X POST \
+          -d '{"event_type":"build"}' \
+          https://api.github.com/repos/$GH_REPO/dispatches
+        env:
+          GH_PAT_ORG: ${{ secrets.GH_PAT_ORG }}
+          GH_REPO: violentmonkey/violentmonkey-astro
+
       - uses: actions/checkout@v3
         with:
           persist-credentials: false
