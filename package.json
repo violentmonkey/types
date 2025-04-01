@@ -1,6 +1,6 @@
 {
   "name": "@violentmonkey/types",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Type declaration for GM functions in Violentmonkey",
   "author": "Gerald <gera2ld@live.com>",
   "main": "index.d.ts",
