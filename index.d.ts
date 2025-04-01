@@ -31,14 +31,14 @@ declare interface VMScriptGMInfoPlatform {
    * Only present in browsers that implement this API (Chromium >= 90).
    * @since VM2.27.0
    */
-  fullVersionList?: { brand: string; version: string }[];
+  fullVersionList?: { brand: string; version: string }[] | undefined;
   /**
    * A copy of `navigator.userAgentData.mobile` from the background script of the extension,
    * so it's not affected by devtools of the web page tab.
    * Only present in browsers that implement this API (Chromium >= 90).
    * @since VM2.27.0
    */
-  mobile?: boolean;
+  mobile?: boolean | undefined;
   os: 'mac' | 'win' | 'android' | 'cros' | 'linux' | 'openbsd' | 'fuchsia';
 }
 
@@ -47,31 +47,31 @@ declare interface VMScriptGMInfoPlatform {
  * Non-optional string property will be an empty string '' if omitted.
  */
 declare interface VMScriptGMInfoScriptMeta {
-  antifeature?: string[];
-  author?: string;
-  compatible?: string[];
-  connect?: string[];
+  antifeature?: string[] | undefined;
+  author?: string | undefined;
+  compatible?: string[] | undefined;
+  connect?: string[] | undefined;
   description: string;
-  downloadURL?: string;
+  downloadURL?: string | undefined;
   excludeMatches: string[];
   excludes: string[];
   /** Empty is the same as `@grant none` */
   grant: string[];
   /** Use homepageURL instead */
-  homepage?: string;
-  homepageURL?: string;
-  icon?: string;
+  homepage?: string | undefined;
+  homepageURL?: string | undefined;
+  icon?: string | undefined;
   includes: string[];
   matches: string[];
   name: string;
   namespace: string;
-  noframes?: boolean;
+  noframes?: boolean | undefined;
   require: string[];
   resources: { name: string; url: string }[];
   runAt: VMScriptRunAt | '';
-  supportURL?: string;
-  unwrap?: boolean;
-  updateURL?: string;
+  supportURL?: string | undefined;
+  unwrap?: boolean | undefined;
+  updateURL?: string | undefined;
   version: string;
 }
 
@@ -126,12 +126,14 @@ declare interface VMScriptGMInfoObject {
    *
    * @since VM2.20.2
    */
-  userAgentData?: {
-    brands: { brand: string; version: string }[];
-    mobile: boolean;
-    platform: string;
-    getHighEntropyValues(hints: string[]): Promise<UADataValues>;
-  };
+  userAgentData?:
+    | {
+        brands: { brand: string; version: string }[];
+        mobile: boolean;
+        platform: string;
+        getHighEntropyValues(hints: string[]): Promise<UADataValues>;
+      }
+    | undefined;
 }
 
 /**
@@ -143,7 +145,7 @@ declare const GM_info: VMScriptGMInfoObject;
 declare function GM_log(...args: any): void;
 
 /** Retrieves a value for current script from storage. */
-declare function GM_getValue<T>(name: string, defaultValue?: T): T;
+declare function GM_getValue<T>(name: string, defaultValue?: T | undefined): T;
 /** @since VM2.19.1 */
 declare function GM_getValues(names: string[]): GenericObject;
 /** @since VM2.19.1 */
@@ -195,7 +197,7 @@ declare function GM_getResourceURL(
    * - If `true`, returns a `blob:` URL. It's short and cacheable, so it's good for reusing in multiple DOM elements.
    * - If `false`, returns a `data:` URL. It's long so reusing it in DOM may be less performant due to the lack of caching, but it's particularly handy for direct synchronous decoding of the data on sites that forbid fetching `blob:` in their CSP.
    */
-  isBlobUrl?: boolean,
+  isBlobUrl?: boolean | undefined,
 ): string;
 
 /**
@@ -219,7 +221,7 @@ declare function GM_addElement(
   /** A tag name like `script`. Any valid HTML tag can be used, but the only motivation for this API was to add `script`, `link`, `style` elements when they are disallowed by a strict `Content-Security-Policy` of the site e.g. github.com, twitter.com. */
   tagName: string,
   /** The keys are HTML attributes, not DOM properties, except `textContent` which sets DOM property `textContent`. The values are strings so if you want to assign a private function to `onload` you can do it after the element is created. */
-  attributes?: Record<string, string>,
+  attributes?: Record<string, string> | undefined,
 ): HTMLElement;
 declare function GM_addElement(
   /**
@@ -235,7 +237,7 @@ declare function GM_addElement(
   /** A tag name like `script`. Any valid HTML tag can be used, but the only motivation for this API was to add `script`, `link`, `style` elements when they are disallowed by a strict `Content-Security-Policy` of the site e.g. github.com, twitter.com. */
   tagName: string,
   /** The keys are HTML attributes, not DOM properties, except `textContent` which sets DOM property `textContent`. The values are strings so if you want to assign a private function to `onload` you can do it after the element is created. */
-  attributes?: Record<string, string>,
+  attributes?: Record<string, string> | undefined,
 ): HTMLElement;
 
 /** Appends and returns a `<style>` element with the specified CSS. */
@@ -243,7 +245,7 @@ declare function GM_addStyle(css: string): HTMLStyleElement;
 
 declare interface VMScriptGMTabControl {
   /** Сan be assigned to a function. If provided, it will be called when the opened tab is closed. */
-  onclose?: () => void;
+  onclose?: (() => void) | undefined;
   /** Whether the opened tab is closed. */
   closed: boolean;
   /** A function to explicitly close the opened tab. */
@@ -252,7 +254,7 @@ declare interface VMScriptGMTabControl {
 
 declare interface VMScriptGMTabOptions {
   /** Make the new tab active (i.e. open in foreground). Default as `true`. */
-  active?: boolean;
+  active?: boolean | undefined;
   /**
    * Firefox only.
    *
@@ -260,24 +262,24 @@ declare interface VMScriptGMTabOptions {
    * - `0` = default (main) container
    * - `1`, `2`, etc. = internal container index
    */
-  container?: number;
+  container?: number | undefined;
   /** Insert the new tab next to the current tab and set its `openerTab` so when it's closed the original tab will be focused automatically. When `false` or not specified, the usual browser behavior is to open the tab at the end of the tab list. Default as `true`. */
-  insert?: boolean;
+  insert?: boolean | undefined;
   /** Pin the tab (i.e. show without a title at the beginning of the tab list). Default as `false`. */
-  pinned?: boolean;
+  pinned?: boolean | undefined;
 }
 
 /** Opens URL in a new tab. */
 declare function GM_openInTab(
   /** The URL to open in a new tab. URL relative to current page is also allowed. Note: Firefox does not support data URLs. */
   url: string,
-  options?: VMScriptGMTabOptions,
+  options?: VMScriptGMTabOptions | undefined,
 ): VMScriptGMTabControl;
 declare function GM_openInTab(
   /** The URL to open in a new tab. URL relative to current page is also allowed. Note: Firefox does not support data URLs. */
   url: string,
   /** Open the tab in background. Note, this is a reverse of the first usage method so for example `true` is the same as `{ active: false }`. */
-  openInBackground?: boolean,
+  openInBackground?: boolean | undefined,
 ): VMScriptGMTabControl;
 
 /**
@@ -291,16 +293,18 @@ declare function GM_registerMenuCommand(
   /** Callback function when the command is clicked in the menu. */
   onClick: (event: MouseEvent | KeyboardEvent) => void,
   /** @since VM2.15.9 */
-  options?: {
-    /** Default: the `caption` parameter.
-     * In 2.15.9-2.16.1 the default was a randomly generated string. */
-    id?: string;
-    /** A hint shown in the status bar when hovering the command. */
-    title?: string;
-    /** Default: `true`.
-     * Whether to auto-close the popup after the user invoked the command. */
-    autoClose?: boolean;
-  },
+  options?:
+    | {
+        /** Default: the `caption` parameter.
+         * In 2.15.9-2.16.1 the default was a randomly generated string. */
+        id?: string | undefined;
+        /** A hint shown in the status bar when hovering the command. */
+        title?: string | undefined;
+        /** Default: `true`.
+         * Whether to auto-close the popup after the user invoked the command. */
+        autoClose?: boolean | undefined;
+      }
+    | undefined,
 ): string;
 /** Unregisters a command which has been registered to Violentmonkey popup menu. */
 declare function GM_unregisterMenuCommand(
@@ -321,12 +325,12 @@ declare interface VMScriptGMNotificationOptions {
   /** Main text of the notification. */
   text: string;
   /** Title of the notification. */
-  title?: string;
+  title?: string | undefined;
   /** URL of an image to show in the notification. */
-  image?: string;
+  image?: string | undefined;
   /** No sounds/vibrations when showing the notification.
    * @since VM2.15.2, Chrome 70. */
-  silent?: boolean;
+  silent?: boolean | undefined;
   /**
    * Unique name of the notification, e.g. 'abc', same as the web Notification API.
    * Names are scoped to each userscript i.e. your tag won't clash with another script's tag.
@@ -335,23 +339,23 @@ declare interface VMScriptGMNotificationOptions {
    * and your notification had `zombieTimeout`).
    * @since VM2.15.4
    */
-  tag?: string;
+  tag?: string | undefined;
   /**
    * Number of milliseconds to keep the notification after the userscript "dies",
    * i.e. when its tab or frame is reloaded/closed/navigated. If not specified or invalid,
    * the default behavior is to immediately remove the notifications.
    * @since VM2.15.4
    */
-  zombieTimeout?: number;
+  zombieTimeout?: number | undefined;
   /**
    * URL to open when a zombie notification is clicked, see `zombieTimeout` for more info.
    * @since VM2.16.1
    */
-  zombieUrl?: string;
+  zombieUrl?: string | undefined;
   /** Callback when the notification is clicked by user. */
-  onclick?: () => void;
+  onclick?: (() => void) | undefined;
   /** Callback when the notification is closed, either by user or by system. */
-  ondone?: () => void;
+  ondone?: (() => void) | undefined;
 }
 
 /** Shows an HTML5 desktop notification. */
@@ -362,11 +366,11 @@ declare function GM_notification(
   /** Main text of the notification. */
   text: string,
   /** Title of the notification. */
-  title?: string,
+  title?: string | undefined,
   /** URL of an image to show in the notification. */
-  image?: string,
+  image?: string | undefined,
   /** Callback when the notification is clicked by user. */
-  onclick?: () => void,
+  onclick?: (() => void) | undefined,
 ): VMScriptGMNotificationControl;
 
 /** Sets data to system clipboard. */
@@ -374,7 +378,7 @@ declare function GM_setClipboard(
   /** The data to be copied to system clipboard. */
   data: string,
   /** The MIME type of data to copy. Default as `text/plain`. */
-  type?: string,
+  type?: string | undefined,
 ): void;
 
 /**
@@ -406,11 +410,11 @@ declare interface VMScriptResponseObject<T> {
   responseXML: Document | null;
   /** The final URL after redirection. */
   finalUrl: string;
-  lengthComputable?: boolean;
-  loaded?: number;
-  total?: number;
+  lengthComputable?: boolean | undefined;
+  loaded?: number | undefined;
+  total?: number | undefined;
   /** The same `context` object you specified in `details`. */
-  context?: unknown;
+  context?: unknown | undefined;
 }
 
 type TypedArray =
@@ -430,9 +434,9 @@ interface GMRequestBase<T> {
   /** URL relative to current page is also allowed. */
   url: string;
   /** User for authentication. */
-  user?: string;
+  user?: string | undefined;
   /** Password for authentication. */
-  password?: string;
+  password?: string | undefined;
   /**
    * Some special headers are also allowed:
    *
@@ -442,28 +446,28 @@ interface GMRequestBase<T> {
    * - `Referer`
    * - `User-Agent`
    */
-  headers?: Record<string, string>;
+  headers?: Record<string, string> | undefined;
   /** Time to wait for the request, none by default. */
-  timeout?: number;
+  timeout?: number | undefined;
   /** Can be an object and will be assigned to context of the response object. */
-  context?: unknown;
+  context?: unknown | undefined;
   /** When set to `true`, no cookie will be sent with the request and the response cookies will be ignored. The default value is `false`. */
-  anonymous?: boolean;
-  onabort?: (resp: VMScriptResponseObject<T>) => void;
-  onerror?: (resp: VMScriptResponseObject<T>) => void;
-  onload?: (resp: VMScriptResponseObject<T>) => void;
-  onloadend?: (resp: VMScriptResponseObject<T>) => void;
-  onloadstart?: (resp: VMScriptResponseObject<T>) => void;
-  onprogress?: (resp: VMScriptResponseObject<T>) => void;
-  onreadystatechange?: (resp: VMScriptResponseObject<T>) => void;
-  ontimeout?: (resp: VMScriptResponseObject<T>) => void;
+  anonymous?: boolean | undefined;
+  onabort?: ((resp: VMScriptResponseObject<T>) => void) | undefined;
+  onerror?: ((resp: VMScriptResponseObject<T>) => void) | undefined;
+  onload?: ((resp: VMScriptResponseObject<T>) => void) | undefined;
+  onloadend?: ((resp: VMScriptResponseObject<T>) => void) | undefined;
+  onloadstart?: ((resp: VMScriptResponseObject<T>) => void) | undefined;
+  onprogress?: ((resp: VMScriptResponseObject<T>) => void) | undefined;
+  onreadystatechange?: ((resp: VMScriptResponseObject<T>) => void) | undefined;
+  ontimeout?: ((resp: VMScriptResponseObject<T>) => void) | undefined;
 }
 
 declare interface VMScriptGMXHRDetails<T> extends GMRequestBase<T> {
   /** HTTP method, default as `GET`. */
-  method?: string;
+  method?: string | undefined;
   /** A MIME type to specify with the request. */
-  overrideMimeType?: string;
+  overrideMimeType?: string | undefined;
   /**
    * One of the following:
    *
@@ -473,7 +477,7 @@ declare interface VMScriptGMXHRDetails<T> extends GMRequestBase<T> {
    * - `arraybuffer`
    * - `document`
    */
-  responseType?: VMScriptResponseType;
+  responseType?: VMScriptResponseType | undefined;
   /** Data to send with the request, usually for `POST` and `PUT` requests. */
   data?:
     | string
@@ -483,9 +487,10 @@ declare interface VMScriptGMXHRDetails<T> extends GMRequestBase<T> {
     | FormData
     | ReadableStream
     | TypedArray
-    | URLSearchParams;
+    | URLSearchParams
+    | undefined;
   /** Send the `data` string as a `blob`. This is for compatibility with Tampermonkey/Greasemonkey, where only `string` type is allowed in `data`. */
-  binary?: boolean;
+  binary?: boolean | undefined;
 }
 
 /** Makes a request like XMLHttpRequest, with some special capabilities, not restricted by same-origin policy. */
@@ -533,12 +538,15 @@ declare interface VMScriptGMObjectVMExtensions {
 declare interface VMScriptGMObject extends VMScriptGMObjectVMExtensions {
   unsafeWindow: Window;
   info: typeof GM_info;
-  getValue: <T>(name: string, defaultValue?: T) => Promise<T>;
+  getValue: <T>(name: string, defaultValue?: T | undefined) => Promise<T>;
   setValue: <T>(name: string, value: T) => Promise<void>;
   deleteValue: (name: string) => Promise<void>;
   listValues: () => Promise<string[]>;
   registerMenuCommand: typeof GM_registerMenuCommand;
-  getResourceUrl: (name: string, isBlobUrl?: boolean) => Promise<string>;
+  getResourceUrl: (
+    name: string,
+    isBlobUrl?: boolean | undefined,
+  ) => Promise<string>;
   notification: typeof GM_notification;
   openInTab: typeof GM_openInTab;
   setClipboard: typeof GM_setClipboard;
