@@ -519,14 +519,13 @@ declare interface VMScriptGMObjectVMExtensions {
   addValueChangeListener: typeof GM_addValueChangeListener;
   /** @since VM2.19.1 */
   deleteValues: (names: string[]) => Promise<void>;
-  download:
-    | ((options: VMScriptGMDownloadOptions) => Promise<Blob> | void)
-    | ((url: string, name: string) => Promise<Blob> | void);
+  download(options: VMScriptGMDownloadOptions): Promise<Blob> | void;
+  download(url: string, name: string): Promise<Blob> | void;
   getResourceText: typeof GM_getResourceText;
   /** @since VM2.19.1 */
-  getValues:
-    | ((names: string[]) => Promise<GenericObject>)
-    | ((namesWithDefaults: GenericObject) => Promise<GenericObject>);
+  getValues(names: string[]): Promise<GenericObject>;
+  /** @since VM2.19.1 */
+  getValues(namesWithDefaults: GenericObject): Promise<GenericObject>;
   log: typeof GM_log;
   removeValueChangeListener: typeof GM_removeValueChangeListener;
   /** @since VM2.19.1 */
