@@ -63,6 +63,35 @@ declare interface VMScriptGMInfoScriptMeta {
   icon?: string | undefined;
   includes: string[];
   matches: string[];
+  /** User options and overrides for the script
+   * @since VM2.31.1 */
+  options: {
+    check_for_updates: boolean,
+    inject_into: VMScriptInjectInto | null,
+    noframes: boolean | null,
+    override: {
+      /** Keep the script's @exclude */
+      merge_excludes: boolean,
+      /** Keep the script's @include */
+      merge_includes: boolean,
+      /** Keep the script's @match */
+      merge_matches: boolean,
+      /** Keep the script's @exclude-match */
+      merge_exclude_matches: boolean,
+      /** User overridden @exclude */
+      use_excludes: string[],
+      /** User overridden @include */
+      use_includes: string[],
+      /** User overridden @match */
+      use_matches: string[],
+      /** User overridden @exclude-match */
+      use_exclude_matches: string[],
+    },
+    run_at: VMScriptRunAt | null,
+    tags: string[],
+    /** Last modification by the user; convertible as `new Date(user_modified)` */
+    user_modified: number,
+  },
   name: string;
   namespace: string;
   noframes?: boolean | undefined;
