@@ -459,7 +459,7 @@ type TypedArray =
   | Float32Array
   | Float64Array;
 
-interface GMRequestBase<T> {
+interface GMRequestBase<T> extends GMRequestBaseEvents<T> {
   /** URL relative to current page is also allowed. */
   url: string;
   /** User for authentication. */
@@ -482,6 +482,9 @@ interface GMRequestBase<T> {
   context?: unknown | undefined;
   /** When set to `true`, no cookie will be sent with the request and the response cookies will be ignored. The default value is `false`. */
   anonymous?: boolean | undefined;
+}
+
+interface GMRequestBaseEvents<T> {
   onabort?: ((resp: VMScriptResponseObject<T>) => void) | undefined;
   onerror?: ((resp: VMScriptResponseObject<T>) => void) | undefined;
   onload?: ((resp: VMScriptResponseObject<T>) => void) | undefined;
@@ -520,6 +523,8 @@ declare interface VMScriptGMXHRDetails<T> extends GMRequestBase<T> {
     | undefined;
   /** Send the `data` string as a `blob`. This is for compatibility with Tampermonkey/Greasemonkey, where only `string` type is allowed in `data`. */
   binary?: boolean | undefined;
+  /** @since VM2.32.0 */
+  upload?: GMRequestBaseEvents<T>;
 }
 
 /** Makes a request like XMLHttpRequest, with some special capabilities, not restricted by same-origin policy. */
