@@ -78,6 +78,9 @@ declare interface VMScriptGMInfoScriptMeta {
       merge_matches: boolean,
       /** Keep the script's `@exclude-match` */
       merge_exclude_matches: boolean,
+      /** Keep the script's `@tag`
+       * @since VM2.35.2 */
+      merge_tags: boolean,
       /** User overridden `@exclude` */
       use_excludes: string[],
       /** User overridden `@include` */
@@ -88,6 +91,8 @@ declare interface VMScriptGMInfoScriptMeta {
       use_exclude_matches: string[],
     },
     run_at: VMScriptRunAt | null,
+    /** User overridden `@tag`
+     * @since VM2.35.2 */
     tags: string[],
     /** Last modification by the user; convertible as `new Date(user_modified)` */
     user_modified: number,
@@ -99,6 +104,8 @@ declare interface VMScriptGMInfoScriptMeta {
   resources: { name: string; url: string }[];
   runAt: VMScriptRunAt | '';
   supportURL?: string | undefined;
+  /** @since VM2.37.0 */
+  tags?: string[],
   unwrap?: boolean | undefined;
   updateURL?: string | undefined;
   version: string;
