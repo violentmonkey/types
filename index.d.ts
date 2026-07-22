@@ -1,3 +1,6 @@
+/// <reference types="@types/firefox-webext-browser" />
+/// <reference types="chrome-types" />
+
 declare const unsafeWindow: Window;
 
 declare type VMScriptRunAt =
@@ -127,6 +130,13 @@ declare interface VMScriptGMInfoObject {
   /** Version of Violentmonkey. */
   version: string;
   /**
+   * GM_download internal implementation:
+   * `native` - the classic `a` element's `download` attribute, used by default.
+   * `browser` - the browser API used if the user enabled it in the extension's options.
+   * @since VM2.45.2
+   */
+  downloadMode: 'native' | 'browser';
+  /**
    * True when this is an incognito profile (Chrome) or private mode (Firefox).
    * @since VM2.15.4
    */
@@ -176,6 +186,24 @@ declare interface VMScriptGMInfoObject {
  * An object that exposes information about the current userscript.
  */
 declare const GM_info: VMScriptGMInfoObject;
+
+/** @since VM2.35.1 */
+declare const GM_cookie: {
+  delete: (
+    opts: browser.cookies._RemoveDetails | chrome.cookies.CookieDetails,
+    callback?: (error?: string) => any,
+  ) => void,
+  /** `httpOnly` cookies are listed only when the HTTP-only option is enabled for the script and globally in the extension */
+  list: (
+    opts: browser.cookies._GetAllDetails | Parameters<typeof chrome.cookies.getAll>[0],
+    callback?: (cookies?: browser.cookies.Cookie | chrome.cookies.Cookie, error?: string) => any,
+  ) => void,
+  /** `httpOnly` cookies are allowed only when the HTTP-only option is enabled for the script and globally in the extension */
+  set: (
+    opts: browser.cookies._SetDetails | Parameters<typeof chrome.cookies.set>[0],
+    callback?: (error?: string) => any,
+  ) => void,
+};
 
 /** The original console.log */
 declare function GM_log(...args: any): void;
@@ -334,6 +362,8 @@ declare function GM_registerMenuCommand(
         /** Default: the `caption` parameter.
          * In 2.15.9-2.16.1 the default was a randomly generated string. */
         id?: string | undefined;
+        /** @since VM2.31.1 */
+        icon?: string | undefined;
         /** A hint shown in the status bar when hovering the command. */
         title?: string | undefined;
         /** Default: `true`.
@@ -542,6 +572,10 @@ declare function GM_xmlhttpRequest<
 declare interface VMScriptGMDownloadOptions extends GMRequestBase<Blob> {
   /** The filename to save as. */
   name: string;
+  /** Used only when GM_info.downloadMode === 'browser' */
+  conflictAction?: browser.downloads.FilenameConflictAction;
+  /** Shows the dialog. Used only when GM_info.downloadMode === 'browser' */
+  saveAs?: boolean;
 }
 
 /** Downloads a URL to a local file. */
@@ -558,6 +592,15 @@ declare interface VMScriptGMObjectVMExtensions {
   addElement: typeof GM_addElement;
   addStyle: typeof GM_addStyle;
   addValueChangeListener: typeof GM_addValueChangeListener;
+  /** @since VM2.35.1 */
+  cookie: {
+    delete: (opts: browser.cookies._RemoveDetails | chrome.cookies.CookieDetails) => Promise<void>,
+    /** `httpOnly` cookies are listed only when the HTTP-only option is enabled for the script and globally in the extension */
+    list: (opts: browser.cookies._GetAllDetails | Parameters<typeof chrome.cookies.getAll>[0]) =>
+      Promise<browser.cookies.Cookie | chrome.cookies.Cookie>,
+    /** `httpOnly` cookies are allowed only when the HTTP-only option is enabled for the script and globally in the extension */
+    set: (opts: browser.cookies._SetDetails | Parameters<typeof chrome.cookies.set>[0]) => Promise<void>,
+  };
   /** @since VM2.19.1 */
   deleteValues: (names: string[]) => Promise<void>;
   download(options: VMScriptGMDownloadOptions): Promise<Blob> | void;
