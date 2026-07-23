@@ -28,21 +28,27 @@ jobs:
           GH_PAT_ORG: ${{ secrets.GH_PAT_ORG }}
           GH_REPO: violentmonkey/violentmonkey-astro
 
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
         with:
-          persist-credentials: false
-          fetch-depth: 100
-      - uses: actions/setup-node@v3
+          version: 11
+          run_install: false
+
+      - name: Install Node.js
+        uses: actions/setup-node@v4
         with:
-          node-version: '20'
-      - uses: pnpm/action-setup@v2
-        with:
-          version: 8
+          node-version: 26
+          cache: 'pnpm'
+          registry-url: 'https://registry.npmjs.org'
+
       - name: Build docs
         run: |
           pnpm i
           pnpm build:docs
           pnpm build:docs --json docs/types.json
+
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@4.0.0
         with:

@@ -1,5 +1,3 @@
-# @violentmonkey/types
-
 ![NPM](https://img.shields.io/npm/v/@violentmonkey/types.svg)
 ![License](https://img.shields.io/npm/l/@violentmonkey/types.svg)
 ![Downloads](https://img.shields.io/npm/dt/@violentmonkey/types.svg)

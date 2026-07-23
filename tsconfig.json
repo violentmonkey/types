@@ -4,10 +4,13 @@
     "module": "esnext",
     "moduleResolution": "node",
     "declaration": false,
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "preserveSymlinks": true
   },
   "include": [
-    "./node_modules/user-agent-data-types/index.d.ts",
     "index.d.ts"
+  ],
+  "files": [
+    "./node_modules/user-agent-data-types/index.d.ts"
   ]
 }
