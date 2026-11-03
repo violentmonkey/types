@@ -4,10 +4,7 @@
 declare const unsafeWindow: Window;
 
 declare type VMScriptRunAt =
-  | 'document-start'
-  | 'document-body'
-  | 'document-end'
-  | 'document-idle';
+  'document-start' | 'document-body' | 'document-end' | 'document-idle';
 
 /** Injection mode of a script. */
 declare type VMScriptInjectInto = 'auto' | 'page' | 'content';
@@ -69,37 +66,37 @@ declare interface VMScriptGMInfoScriptMeta {
   /** User options and overrides for the script
    * @since VM2.31.1 */
   options: {
-    check_for_updates: boolean,
-    inject_into: VMScriptInjectInto | null,
-    noframes: boolean | null,
+    check_for_updates: boolean;
+    inject_into: VMScriptInjectInto | null;
+    noframes: boolean | null;
     override: {
       /** Keep the script's `@exclude` */
-      merge_excludes: boolean,
+      merge_excludes: boolean;
       /** Keep the script's `@include` */
-      merge_includes: boolean,
+      merge_includes: boolean;
       /** Keep the script's `@match` */
-      merge_matches: boolean,
+      merge_matches: boolean;
       /** Keep the script's `@exclude-match` */
-      merge_exclude_matches: boolean,
+      merge_exclude_matches: boolean;
       /** Keep the script's `@tag`
        * @since VM2.35.2 */
-      merge_tags: boolean,
+      merge_tags: boolean;
       /** User overridden `@exclude` */
-      use_excludes: string[],
+      use_excludes: string[];
       /** User overridden `@include` */
-      use_includes: string[],
+      use_includes: string[];
       /** User overridden `@match` */
-      use_matches: string[],
+      use_matches: string[];
       /** User overridden `@exclude-match` */
-      use_exclude_matches: string[],
-    },
-    run_at: VMScriptRunAt | null,
+      use_exclude_matches: string[];
+    };
+    run_at: VMScriptRunAt | null;
     /** User overridden `@tag`
      * @since VM2.35.2 */
-    tags: string[],
+    tags: string[];
     /** Last modification by the user; convertible as `new Date(user_modified)` */
-    user_modified: number,
-  },
+    user_modified: number;
+  };
   name: string;
   namespace: string;
   noframes?: boolean | undefined;
@@ -108,7 +105,7 @@ declare interface VMScriptGMInfoScriptMeta {
   runAt: VMScriptRunAt | '';
   supportURL?: string | undefined;
   /** @since VM2.37.0 */
-  tags?: string[],
+  tags?: string[];
   unwrap?: boolean | undefined;
   updateURL?: string | undefined;
   version: string;
@@ -190,38 +187,82 @@ declare const GM_info: VMScriptGMInfoObject;
 /** @since VM2.35.1 */
 declare const GM_cookie: {
   delete: (
-    opts: browser.cookies._RemoveDetails | chrome.cookies.CookieDetails,
+    opts:
+      /* firefox-start */
+      | browser.cookies._RemoveDetails /* firefox-end */
+      /* chrome-start */
+      | chrome.cookies.CookieDetails /* chrome-end */,
     callback?: (error?: string) => any,
-  ) => void,
+  ) => void;
   /** `httpOnly` cookies are listed only when the HTTP-only option is enabled for the script and globally in the extension */
   list: (
-    opts: browser.cookies._GetAllDetails | Parameters<typeof chrome.cookies.getAll>[0],
-    callback?: (cookies?: browser.cookies.Cookie | chrome.cookies.Cookie, error?: string) => any,
-  ) => void,
+    opts:
+      /* firefox-start */
+      | browser.cookies._GetAllDetails /* firefox-end */
+      /* chrome-start */
+      | Parameters<typeof chrome.cookies.getAll>[0] /* chrome-end */,
+    callback?: (
+      cookies?:
+        /* firefox-start */
+        | browser.cookies.Cookie /* firefox-end */
+        /* chrome-start */
+        | chrome.cookies.Cookie /* chrome-end */,
+      error?: string,
+    ) => any,
+  ) => void;
   /** `httpOnly` cookies are allowed only when the HTTP-only option is enabled for the script and globally in the extension */
   set: (
-    opts: browser.cookies._SetDetails | Parameters<typeof chrome.cookies.set>[0],
+    opts:
+      /* firefox-start */
+      | browser.cookies._SetDetails /* firefox-end */
+      /* chrome-start */
+      | Parameters<typeof chrome.cookies.set>[0] /* chrome-end */,
     callback?: (error?: string) => any,
-  ) => void,
+  ) => void;
 };
 
 /** The original console.log */
 declare function GM_log(...args: any): void;
 
 /** Retrieves a value for current script from storage. */
-declare function GM_getValue<T>(name: string, defaultValue?: T | undefined): T;
+declare function GM_getValue<T>(
+  /** The name for `value` to load. */
+  name: string,
+  /** The default value to return if no value exists in the storage. */
+  defaultValue?: T | undefined,
+): T;
 /** @since VM2.19.1 */
-declare function GM_getValues(names: string[]): GenericObject;
+declare function GM_getValues(
+  /** Names of the values to read, missing ones are left out of the result. */
+  names: string[],
+): GenericObject;
 /** @since VM2.19.1 */
-declare function GM_getValues(namesWithDefaults: GenericObject): GenericObject;
+declare function GM_getValues(
+  /** Each key is a name to read from storage, the value is the default to be used in the result if the key was not in storage. */
+  namesWithDefaults: GenericObject,
+): GenericObject;
 /** Sets a key / value pair for current script to storage. */
-declare function GM_setValue<T>(name: string, value: T): void;
+declare function GM_setValue<T>(
+  /** The unique name for `value` within this script. */
+  name: string,
+  /** The value to be stored, which must be *JSON serializable* (string, number, boolean, null, or an array/object consisting of these types) so for example you can't store DOM elements or objects with cyclic dependencies. */
+  value: T,
+): void;
 /** @since VM2.19.1 */
-declare function GM_setValues(values: GenericObject): void;
+declare function GM_setValues(
+  /** Each `key:value` pair in the object will be stored individually. Must be *JSON serializable* (see `GM_setValue`). */
+  values: GenericObject,
+): void;
 /** Deletes an existing key / value pair for current script from storage. */
-declare function GM_deleteValue(name: string): void;
+declare function GM_deleteValue(
+  /** The unique name for `value` within this script. */
+  name: string,
+): void;
 /** @since VM2.19.1 */
-declare function GM_deleteValues(names: string[]): void;
+declare function GM_deleteValues(
+  /** Array of keys to delete. */
+  names: string[],
+): void;
 /** Returns an array of keys of all available values within this script. */
 declare function GM_listValues(): string[];
 
@@ -238,11 +279,16 @@ declare type VMScriptGMValueChangeCallback<T> = (
 
 /** Adds a change listener to the storage and returns the listener ID. */
 declare function GM_addValueChangeListener<T>(
+  /** The name of the observed variable. */
   name: string,
+  /** Called when the value changes. */
   callback: VMScriptGMValueChangeCallback<T>,
 ): string;
 /** Removes a change listener by its ID. */
-declare function GM_removeValueChangeListener(listenerId: string): void;
+declare function GM_removeValueChangeListener(
+  /** The listener ID returned by `GM_addValueChangeListener`. */
+  listenerId: string,
+): void;
 
 /** Retrieves a text resource from the *Metadata Block*. */
 declare function GM_getResourceText(
@@ -305,7 +351,10 @@ declare function GM_addElement(
 ): HTMLElement;
 
 /** Appends and returns a `<style>` element with the specified CSS. */
-declare function GM_addStyle(css: string): HTMLStyleElement;
+declare function GM_addStyle(
+  /** The CSS code to inject. */
+  css: string,
+): HTMLStyleElement;
 
 declare interface VMScriptGMTabControl {
   /** Сan be assigned to a function. If provided, it will be called when the opened tab is closed. */
@@ -456,11 +505,7 @@ declare interface VMScriptXHRControl {
 }
 
 declare type VMScriptResponseType =
-  | 'text'
-  | 'json'
-  | 'blob'
-  | 'arraybuffer'
-  | 'document';
+  'text' | 'json' | 'blob' | 'arraybuffer' | 'document';
 
 /**
  * https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest#properties
@@ -594,12 +639,34 @@ declare interface VMScriptGMObjectVMExtensions {
   addValueChangeListener: typeof GM_addValueChangeListener;
   /** @since VM2.35.1 */
   cookie: {
-    delete: (opts: browser.cookies._RemoveDetails | chrome.cookies.CookieDetails) => Promise<void>,
+    delete: (
+      opts:
+        /* firefox-start */
+        | browser.cookies._RemoveDetails /* firefox-end */
+        /* chrome-start */
+        | chrome.cookies.CookieDetails /* chrome-end */,
+    ) => Promise<void>;
     /** `httpOnly` cookies are listed only when the HTTP-only option is enabled for the script and globally in the extension */
-    list: (opts: browser.cookies._GetAllDetails | Parameters<typeof chrome.cookies.getAll>[0]) =>
-      Promise<browser.cookies.Cookie | chrome.cookies.Cookie>,
+    list: (
+      opts:
+        /* firefox-start */
+        | browser.cookies._GetAllDetails /* firefox-end */
+        /* chrome-start */
+        | Parameters<typeof chrome.cookies.getAll>[0] /* chrome-end */,
+    ) => Promise<
+      /* firefox-start */
+      | browser.cookies.Cookie /* firefox-end */
+      /* chrome-start */
+      | chrome.cookies.Cookie /* chrome-end */
+    >;
     /** `httpOnly` cookies are allowed only when the HTTP-only option is enabled for the script and globally in the extension */
-    set: (opts: browser.cookies._SetDetails | Parameters<typeof chrome.cookies.set>[0]) => Promise<void>,
+    set: (
+      opts:
+        /* firefox-start */
+        | browser.cookies._SetDetails /* firefox-end */
+        /* chrome-start */
+        | Parameters<typeof chrome.cookies.set>[0] /* chrome-end */,
+    ) => Promise<void>;
   };
   /** @since VM2.19.1 */
   deleteValues: (names: string[]) => Promise<void>;

@@ -7,10 +7,6 @@
     "allowSyntheticDefaultImports": true,
     "preserveSymlinks": true
   },
-  "include": [
-    "index.d.ts"
-  ],
-  "files": [
-    "./node_modules/user-agent-data-types/index.d.ts"
-  ]
+  "include": ["index.d.ts"],
+  "files": ["./node_modules/user-agent-data-types/index.d.ts"]
 }
