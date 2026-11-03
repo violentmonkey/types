@@ -731,7 +731,7 @@ declare interface VMScriptGMObject extends VMScriptGMObjectVMExtensions {
   setClipboard: typeof GM_setClipboard;
   xmlHttpRequest: <T = string | Blob | ArrayBuffer | Document | object>(
     details: VMScriptGMXHRDetails<T>,
-  ) => Promise<T> & VMScriptXHRControl;
+  ) => Promise<VMScriptResponseObject<T>> & VMScriptXHRControl;
 }
 
 declare const GM: VMScriptGMObject;
