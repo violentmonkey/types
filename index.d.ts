@@ -379,11 +379,15 @@ declare interface VMScriptGMTabOptions {
    * - not specified = reuse script's tab container
    * - `0` = default (main) container
    * - `1`, `2`, etc. = internal container index
+   *
+   * @since VM2.12.5
    */
   container?: number | undefined;
-  /** Insert the new tab next to the current tab and set its `openerTab` so when it's closed the original tab will be focused automatically. When `false` or not specified, the usual browser behavior is to open the tab at the end of the tab list. Default as `true`. */
+  /** Insert the new tab next to the current tab and set its `openerTab` so when it's closed the original tab will be focused automatically. When `false` or not specified, the usual browser behavior is to open the tab at the end of the tab list. Default as `true`.
+   * @since VM2.11.0 */
   insert?: boolean | undefined;
-  /** Pin the tab (i.e. show without a title at the beginning of the tab list). Default as `false`. */
+  /** Pin the tab (i.e. show without a title at the beginning of the tab list). Default as `false`.
+   * @since VM2.12.5 */
   pinned?: boolean | undefined;
 }
 
@@ -451,7 +455,7 @@ declare interface VMScriptGMNotificationOptions {
   title?: string | undefined;
   /** URL of an image to show in the notification. */
   image?: string | undefined;
-  /** No sounds/vibrations when showing the notification.
+  /** No sounds/vibrations when showing the notification. Only for Chromium-based browsers as of Aug 2023. Default as `false`.
    * @since VM2.15.2, Chrome 70. */
   silent?: boolean | undefined;
   /**
@@ -475,13 +479,13 @@ declare interface VMScriptGMNotificationOptions {
    * @since VM2.16.1
    */
   zombieUrl?: string | undefined;
-  /** Callback when the notification is clicked by user. */
+  /** Callback when the notification is clicked by user. As of VM2.15.2 it also forces the notification to be visible until clicked in Chrome which by default hides the notification after a few seconds. */
   onclick?: (() => void) | undefined;
   /** Callback when the notification is closed, either by user or by system. */
   ondone?: (() => void) | undefined;
 }
 
-/** Shows an HTML5 desktop notification. */
+/** Shows an HTML5 desktop notification. Since VM2.12.8 it returns a control object with a function to remove the notification. */
 declare function GM_notification(
   options: VMScriptGMNotificationOptions,
 ): VMScriptGMNotificationControl;
@@ -525,12 +529,18 @@ declare interface VMScriptResponseObject<T> {
   readyState: number;
   responseHeaders: string;
   response: T | null;
+  /** Only provided when available. */
   responseText: string | undefined;
+  /** Only provided when available.
+   * @since VM2.13.4 */
   responseXML: Document | null;
   /** The final URL after redirection. */
   finalUrl: string;
+  /** Only provided when available. */
   lengthComputable?: boolean | undefined;
+  /** Only provided when available. */
   loaded?: number | undefined;
+  /** Only provided when available. */
   total?: number | undefined;
   /** The same `context` object you specified in `details`. */
   context?: unknown | undefined;
@@ -566,11 +576,13 @@ interface GMRequestBase<T> extends GMRequestBaseEvents<T> {
    * - `User-Agent`
    */
   headers?: Record<string, string> | undefined;
-  /** Time to wait for the request, none by default. */
+  /** Time to wait for the request, none by default.
+   * @since VM2.9.5 */
   timeout?: number | undefined;
   /** Can be an object and will be assigned to context of the response object. */
   context?: unknown | undefined;
-  /** When set to `true`, no cookie will be sent with the request and the response cookies will be ignored. The default value is `false`. */
+  /** When set to `true`, no cookie will be sent with the request and the response cookies will be ignored. The default value is `false`.
+   * @since VM2.10.1 */
   anonymous?: boolean | undefined;
 }
 
@@ -579,6 +591,7 @@ interface GMRequestBaseEvents<T> {
   onerror?: ((resp: VMScriptResponseObject<T>) => void) | undefined;
   onload?: ((resp: VMScriptResponseObject<T>) => void) | undefined;
   onloadend?: ((resp: VMScriptResponseObject<T>) => void) | undefined;
+  /** @since VM2.12.5 */
   onloadstart?: ((resp: VMScriptResponseObject<T>) => void) | undefined;
   onprogress?: ((resp: VMScriptResponseObject<T>) => void) | undefined;
   onreadystatechange?: ((resp: VMScriptResponseObject<T>) => void) | undefined;
@@ -611,7 +624,8 @@ declare interface VMScriptGMXHRDetails<T> extends GMRequestBase<T> {
     | TypedArray
     | URLSearchParams
     | undefined;
-  /** Send the `data` string as a `blob`. This is for compatibility with Tampermonkey/Greasemonkey, where only `string` type is allowed in `data`. */
+  /** Send the `data` string as a `blob`. This is for compatibility with Tampermonkey/Greasemonkey, where only `string` type is allowed in `data`.
+   * @since VM2.12.2 */
   binary?: boolean | undefined;
   /** @since VM2.32.0 */
   upload?: GMRequestBaseEvents<T>;
