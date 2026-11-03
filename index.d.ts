@@ -306,6 +306,9 @@ declare function GM_getResourceURL(
   /**
    * - If `true`, returns a `blob:` URL. It's short and cacheable, so it's good for reusing in multiple DOM elements.
    * - If `false`, returns a `data:` URL. It's long so reusing it in DOM may be less performant due to the lack of caching, but it's particularly handy for direct synchronous decoding of the data on sites that forbid fetching `blob:` in their CSP.
+   *
+   * Default as `true`.
+   * @since VM2.13.1
    */
   isBlobUrl?: boolean | undefined,
 ): string;
@@ -326,6 +329,8 @@ declare function GM_getResourceURL(
  * // appending to an arbitrary node
  * let el = GM_addElement(parentElement.shadowRoot, 'iframe', { src: url });
  * ```
+ *
+ * @since VM2.13.1
  */
 declare function GM_addElement(
   /** A tag name like `script`. Any valid HTML tag can be used, but the only motivation for this API was to add `script`, `link`, `style` elements when they are disallowed by a strict `Content-Security-Policy` of the site e.g. github.com, twitter.com. */
@@ -403,7 +408,10 @@ declare function GM_openInTab(
 declare function GM_registerMenuCommand(
   /** The name to show in the popup menu. */
   caption: string,
-  /** Callback function when the command is clicked in the menu. */
+  /**
+   * Callback function when the command is clicked in the menu.
+   * It receives the event that activated the command (since VM2.13.1) so you can check `event.button`, `event.shiftKey`, `event.key`, and so on.
+   */
   onClick: (event: MouseEvent | KeyboardEvent) => void,
   /** @since VM2.15.9 */
   options?:
