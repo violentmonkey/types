@@ -645,14 +645,16 @@ declare interface VMScriptGMDownloadOptions extends GMRequestBase<Blob> {
   saveAs?: boolean;
 }
 
-/** Downloads a URL to a local file. */
-declare function GM_download(options: VMScriptGMDownloadOptions): void;
+/** Downloads a URL to a local file. Returns a control object with a function to abort the request, same as `GM_xmlhttpRequest`. */
+declare function GM_download(
+  options: VMScriptGMDownloadOptions,
+): VMScriptXHRControl;
 declare function GM_download(
   /** The URL to download. */
   url: string,
   /** The filename to save as. */
   name: string,
-): void;
+): VMScriptXHRControl;
 
 /** Aliases for GM_ methods that are not included in Greasemonkey4 API */
 declare interface VMScriptGMObjectVMExtensions {
@@ -692,8 +694,13 @@ declare interface VMScriptGMObjectVMExtensions {
   };
   /** @since VM2.19.1 */
   deleteValues: (names: string[]) => Promise<void>;
-  download(options: VMScriptGMDownloadOptions): Promise<Blob> | void;
-  download(url: string, name: string): Promise<Blob> | void;
+  download(
+    options: VMScriptGMDownloadOptions,
+  ): Promise<VMScriptResponseObject<Blob>> & VMScriptXHRControl;
+  download(
+    url: string,
+    name: string,
+  ): Promise<VMScriptResponseObject<Blob>> & VMScriptXHRControl;
   getResourceText: typeof GM_getResourceText;
   /** @since VM2.19.1 */
   getValues(names: string[]): Promise<GenericObject>;
