@@ -224,6 +224,45 @@ declare const GM_cookie: {
 /** The original console.log */
 declare function GM_log(...args: any): void;
 
+/**
+ * Reports a JSON-serializable value to the agent. Values over 256k characters are rejected.
+ */
+declare type VMScriptGMMcpReport = (
+  value: unknown,
+  options?: { error?: string },
+) => Promise<void>;
+
+declare interface VMScriptGMMcpHandler {
+  /** Shown to the agent. */
+  description?: string;
+  /** JSON Schema of `params`, shown to the agent but not validated. */
+  inputSchema?: object;
+  /**
+   * Handles a call. Its return value, which must be JSON-serializable, settles the call.
+   * `report` adds results to this call, also after it settled.
+   */
+  handle(call: { params: any; report: VMScriptGMMcpReport }): unknown;
+}
+
+/** @since VM2.50.1 */
+declare interface VMScriptGMMcp {
+  /**
+   * Registers handlers by name, replacing existing ones of the same name.
+   * Resolves to a function that removes them.
+   */
+  register(handlers: {
+    [name: string]: VMScriptGMMcpHandler;
+  }): Promise<() => Promise<void>>;
+  /** Reports a result that is not tied to any call. */
+  report: VMScriptGMMcpReport;
+}
+
+/**
+ * Lets an AI agent connected via MCP call handlers registered by the script.
+ * @since VM2.50.1
+ */
+declare const GM_mcp: VMScriptGMMcp;
+
 /** Retrieves a value for current script from storage. */
 declare function GM_getValue<T>(
   /** The name for `value` to load. */
@@ -707,6 +746,8 @@ declare interface VMScriptGMObjectVMExtensions {
   /** @since VM2.19.1 */
   getValues(namesWithDefaults: GenericObject): Promise<GenericObject>;
   log: typeof GM_log;
+  /** @since VM2.50.1 */
+  mcp: typeof GM_mcp;
   removeValueChangeListener: typeof GM_removeValueChangeListener;
   /** @since VM2.19.1 */
   setValues: (values: GenericObject) => Promise<void>;
